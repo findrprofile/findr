@@ -87,25 +87,60 @@ document.addEventListener('DOMContentLoaded', () => {
         // App logic based on page
         const path = window.location.pathname;
 
-        if (document.getElementById('locationName')) {
+        if (path.includes('index.html') || path === '/') {
             initDashboard();
+        } else if (path.includes('friends.html')) {
+            initFriendsPage();
         } else if (path.includes('profile.html')) {
             initProfile();
+        } else if (path.includes('settings.html')) {
+            initSettings();
         }
-
-        setupLogout();
     }
 
     function initDashboard() {
-        // Mock Data (Fallback)
-        const mockLocation = {
-            name: "MN (Maanjiwe Nendamowinan)",
-            shortName: "MN"
-        };
+        // Dashboard can show stats or news in the future
+        console.log("Dashboard initialized");
+    }
 
-        // Initialize App UI
-        initLocation(mockLocation);
+    function initFriendsPage() {
         renderUsers();
+    }
+
+    async function initSettings() {
+        const locationToggle = document.getElementById('locationToggle');
+        const logoutBtn = document.getElementById('logoutBtnFull');
+
+        if (locationToggle && auth.currentUser) {
+            // Load current preference
+            const doc = await db.collection('users').doc(auth.currentUser.uid).get();
+            if (doc.exists && doc.data().locationTracking !== undefined) {
+                locationToggle.checked = doc.data().locationTracking;
+            }
+
+            locationToggle.addEventListener('change', async () => {
+                try {
+                    await db.collection('users').doc(auth.currentUser.uid).update({
+                        locationTracking: locationToggle.checked
+                    });
+                    console.log("Location tracking updated:", locationToggle.checked);
+                } catch (error) {
+                    console.error("Error updating tracking preference:", error);
+                }
+            });
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                if (confirm('Are you sure you want to log out?')) {
+                    try {
+                        await auth.signOut();
+                    } catch (error) {
+                        console.error("Logout Error:", error);
+                    }
+                }
+            });
+        }
     }
 
     // Render Users from Firestore
@@ -116,6 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
         userListEl.innerHTML = '<div class="loading-users">Searching for people nearby...</div>';
 
         try {
+            // Only show users who have location tracking enabled (if we were being real)
+            // For now, show everyone except self
             const snapshot = await db.collection('users').get();
             userListEl.innerHTML = '';
 
@@ -289,22 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (document.getElementById('locationNameShort')) {
             document.getElementById('locationNameShort').textContent = shortName;
-        }
-    }
-
-    function setupLogout() {
-        const settingsTab = document.querySelector('.nav-item:last-child');
-        if (settingsTab) {
-            settingsTab.addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (confirm('Are you sure you want to log out?')) {
-                    try {
-                        await auth.signOut();
-                    } catch (error) {
-                        console.error("Logout Error:", error);
-                    }
-                }
-            });
         }
     }
 });

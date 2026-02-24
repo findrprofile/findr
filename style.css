@@ -305,6 +305,102 @@ body {
     color: var(--primary-cyan);
 }
 
+/* Settings Page Styles */
+.settings-section {
+    padding: 20px;
+}
+
+.settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.settings-group {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 2px solid #f0f0f0;
+}
+
+.settings-info h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.settings-info p {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: var(--primary-cyan);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--primary-cyan);
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+.btn-logout-full {
+    width: 100%;
+    margin-top: 40px;
+    padding: 15px;
+    background: var(--accent-red);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-full);
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 /* Profile Badge Colors */
 .interest-title {
     color: var(--accent-orange);

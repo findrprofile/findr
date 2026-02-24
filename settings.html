@@ -4,15 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Findr - Location Based Social</title>
+    <title>Settings - Findr</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
-
     <header class="app-header">
         <div class="header-main">
             <div class="logo-text">Findr</div>
@@ -27,22 +26,50 @@
     </header>
 
     <main class="app-content">
-        <section class="welcome-section">
-            <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 20px;">Welcome Back!</h1>
+        <section class="settings-section">
+            <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 20px;">Settings</h1>
 
-            <div
-                style="background: var(--bg-light); padding: 40px 20px; border-radius: var(--radius-lg); text-align: center;">
-                <h2 style="font-size: 20px; margin-bottom: 10px;">Who's Nearby?</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 25px;">Check the Friends tab to see people at
-                    Maanjiwe Nendamowinan.</p>
-                <a href="friends.html" class="btn-primary" style="display: inline-block; text-decoration: none;">View
-                    Friends</a>
+            <div class="settings-list">
+                <div class="settings-group">
+                    <div class="settings-info">
+                        <h3>Location Tracking</h3>
+                        <p>Allow Findr to see your current campus location</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="locationToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-info">
+                        <h3>Notifications</h3>
+                        <p>Receive alerts for nearby activity</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked disabled>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-info">
+                        <h3>Privacy Mode</h3>
+                        <p>Hide your profile from non-friends</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" disabled>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button id="logoutBtnFull" class="btn-logout-full">Log Out</button>
             </div>
         </section>
     </main>
 
     <nav class="bottom-nav">
-        <a href="index.html" class="nav-item active">
+        <a href="index.html" class="nav-item">
             <div class="nav-icon-container">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
@@ -67,12 +94,12 @@
             </div>
             <span>Profile</span>
         </a>
-        <a href="settings.html" class="nav-item">
+        <a href="settings.html" class="nav-item active">
             <div class="nav-icon-container">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="3" />
                     <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                 </svg>
             </div>
             <span>Settings</span>

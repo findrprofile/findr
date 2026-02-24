@@ -126,32 +126,90 @@ document.addEventListener('DOMContentLoaded', () => {
         renderUsers();
     }
 
-    async function initProfile() {
-        const user = auth.currentUser;
-        if (!user) return;
+    // Render Users from Firestore
+    async function renderUsers() {
+        const userListEl = document.getElementById('userList');
+        if (!userListEl) return;
 
-        const userNameDisplay = document.getElementById('userNameDisplay');
-        const userEmailDisplay = document.getElementById('userEmailDisplay');
-        const userAvatar = document.getElementById('userAvatar');
-        const myTagsContainer = document.getElementById('myTags');
-
-        if (userEmailDisplay) userEmailDisplay.textContent = user.email;
+        userListEl.innerHTML = '<div class="loading-users">Searching for people nearby...</div>';
 
         try {
-            const doc = await db.collection('users').doc(user.uid).get();
+            const snapshot = await db.collection('users').get();
+            userListEl.innerHTML = '';
+
+            snapshot.forEach(doc => {
+                const userData = doc.data();
+                if (auth.currentUser && userData.email !== auth.currentUser.email) {
+                    const card = createUserCard({
+                        id: doc.id,
+                        name: userData.name || userData.email.split('@')[0],
+                        avatar: userData.avatar || '',
+                        location: userData.location || 'DV (William G. Davis Building)',
+                        time: userData.time || 'Now'
+                    });
+                    userListEl.appendChild(card);
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    }
+
+    function createUserCard(user) {
+        const container = document.createElement('div');
+        container.style.cssText = 'display: flex; align-items: center; gap: 15px; margin-bottom: 20px; cursor: pointer;';
+        container.onclick = () => window.location.href = `profile.html?uid=${user.id}`;
+
+        const avatar = document.createElement('img');
+        avatar.src = user.avatar || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ij48L2NpcmNsZT48cGF0aCBkPSJNMjAgMjF2LTIgYTQgNCAwIDAgMC00LTRoLTggYTQgNCAwIDAgMC00IDR2MiI+PC9wYXRoPjwvc3ZnPg==';
+        avatar.style.cssText = 'width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary-cyan); object-fit: cover;';
+
+        const info = document.createElement('div');
+
+        const name = document.createElement('div');
+        name.textContent = user.name;
+        name.style.fontWeight = '800';
+        name.style.fontSize = '18px';
+
+        const locationText = document.createElement('div');
+        locationText.textContent = `${user.location} • ${user.time}`;
+        locationText.style.fontSize = '14px';
+        locationText.style.color = '#555';
+
+        info.appendChild(name);
+        info.appendChild(locationText);
+        container.appendChild(avatar);
+        container.appendChild(info);
+
+        return container;
+    }
+
+    async function initProfile() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const uid = urlParams.get('uid') || (auth.currentUser ? auth.currentUser.uid : null);
+
+        if (!uid) return;
+
+        const backNav = document.getElementById('backToFriends');
+        if (backNav) backNav.onclick = () => window.history.back();
+
+        try {
+            const doc = await db.collection('users').doc(uid).get();
             if (doc.exists) {
                 const userData = doc.data();
-                if (userNameDisplay) userNameDisplay.textContent = userData.name || user.email.split('@')[0];
-                if (userAvatar && userData.avatar) userAvatar.src = userData.avatar;
+                document.getElementById('userNameDisplay').textContent = userData.name || userData.email.split('@')[0];
+                if (userData.avatar) document.getElementById('userAvatar').src = userData.avatar;
+                if (userData.bio) document.getElementById('userBioDisplay').textContent = userData.bio;
 
-                if (myTagsContainer && userData.tags) {
-                    myTagsContainer.innerHTML = '';
-                    userData.tags.forEach(tag => {
-                        const tagEl = document.createElement('span');
-                        tagEl.className = `tag ${tag.color || 'blue'}`;
-                        tagEl.textContent = tag.text || tag;
-                        myTagsContainer.appendChild(tagEl);
-                    });
+                // Render categorized tags
+                renderCategorizedTags(userData.tags || []);
+
+                // Set Up Action Button
+                const actionBtn = document.getElementById('profileActionBtn');
+                if (actionBtn) {
+                    const isOwnProfile = auth.currentUser && uid === auth.currentUser.uid;
+                    actionBtn.textContent = isOwnProfile ? 'Edit Profile' : 'Remove Friend';
+                    actionBtn.className = isOwnProfile ? 'btn-edit-profile' : 'btn-remove-friend';
                 }
             }
         } catch (error) {
@@ -160,6 +218,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Connectivity for future uploader
         setupUploader();
+    }
+
+    function renderCategorizedTags(tags) {
+        const interestsContainer = document.getElementById('interestsTags');
+        const skillsContainer = document.getElementById('skillsTags');
+        const hangoutContainer = document.getElementById('hangoutTags');
+
+        if (!interestsContainer) return;
+
+        interestsContainer.innerHTML = '';
+        skillsContainer.innerHTML = '';
+        hangoutContainer.innerHTML = '';
+
+        tags.forEach(tag => {
+            const pill = document.createElement('span');
+            pill.className = 'pill';
+            pill.textContent = tag.text || tag;
+
+            // Simple heuristic for demo
+            const lowText = pill.textContent.toLowerCase();
+            if (tag.color === 'orange' || ['gaming', 'video games', 'basketball', 'automobiles', 'movies', 'finance', 'strength training'].some(k => lowText.includes(k))) {
+                pill.classList.add('orange');
+                interestsContainer.appendChild(pill);
+            } else if (tag.color === 'blue' || ['math', 'computer science', 'statistics', 'ux design', 'design', 'graphic design'].some(k => lowText.includes(k))) {
+                pill.classList.add('blue');
+                skillsContainer.appendChild(pill);
+            } else {
+                pill.classList.add('purple');
+                hangoutContainer.appendChild(pill);
+            }
+        });
     }
 
     function setupUploader() {

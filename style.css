@@ -66,14 +66,6 @@ body {
     align-items: center;
 }
 
-/* Simulated cap on the 'i' */
-.logo-text::after {
-    content: '🎓';
-    font-size: 16px;
-    position: absolute;
-    top: 15px;
-    left: 54%;
-}
 
 .notification-bell {
     position: absolute;

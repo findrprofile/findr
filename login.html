@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Findr</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="login-page">
+    <div class="login-container">
+        <header class="login-header">
+            <div class="logo-text">Findr</div>
+            <p class="subtitle">Connect with people at your campus</p>
+        </header>
+
+        <main class="login-form-container">
+            <form id="loginForm" class="auth-form">
+                <div class="input-group">
+                    <label for="email">UofT Email</label>
+                    <input type="email" id="email" placeholder="utorid@mail.utoronto.ca" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <div id="authError" class="error-message"></div>
+
+                <button type="submit" id="loginBtn" class="btn-primary">Sign In</button>
+                <div class="form-footer">
+                    <span>Don't have an account?</span>
+                    <a href="signup.html" class="btn-link">Create Account</a>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,410 @@
+:root {
+    --primary-teal: #008080;
+    --primary-teal-light: #00A8A8;
+    --secondary-bg: #E0F2F1;
+    --dark-bg: #004D40;
+    --text-primary: #1F2937;
+    --text-secondary: #4B5563;
+    --white: #FFFFFF;
+    --card-bg: #006064;
+    /* Darker teal for cards */
+    --accent-orange: #F59E0B;
+    --accent-blue: #3B82F6;
+    --accent-purple: #8B5CF6;
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #F3F4F6;
+    color: var(--text-primary);
+    padding-bottom: 80px;
+    /* Space for bottom nav */
+}
+
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-text {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary-teal);
+    font-family: serif;
+    /* Fallback for the custom font style */
+    letter-spacing: -1px;
+}
+
+.notification-icon {
+    position: relative;
+    color: var(--primary-teal-light);
+    background-color: #E0F7FA;
+    padding: 10px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--text-primary);
+    border-radius: 50%;
+}
+
+/* Content */
+.app-content {
+    padding: 20px;
+}
+
+.welcome-section h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+.location-name {
+    font-weight: 800;
+    color: #000;
+}
+
+.location-card {
+    width: 100%;
+    height: 200px;
+    background-color: var(--primary-teal);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    border: 4px solid var(--primary-teal);
+    margin-bottom: 30px;
+}
+
+.location-image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--dark-bg);
+    font-weight: 600;
+}
+
+.users-section h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.user-card-container {
+    background-color: var(--card-bg);
+    border-radius: 40px 10px 10px 40px;
+    /* Specific shape from screenshot */
+    padding: 0;
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+    /* To handle the complex shape, we might need a wrapper or pseudo-elements, 
+       but simplified border-radius works well for CSS-only */
+    box-shadow: var(--shadow);
+    /* For the specific look: left side rounded heavily, right side less so */
+    border-radius: 50px 20px 20px 50px;
+    margin-top: 20px;
+    /* Space for the floating header part */
+}
+
+/* The header bar on top of the card */
+.user-card-header {
+    background-color: #000;
+    color: #fff;
+    padding: 5px 15px 5px 60px;
+    /* Left padding for avatar overlap */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 20px 20px 0 0;
+    margin-left: 20px;
+    /* Offset */
+    margin-right: 20px;
+    position: relative;
+    top: 15px;
+    z-index: 1;
+}
+
+.user-card-body {
+    background-color: var(--primary-teal);
+    padding: 25px 15px 15px 70px;
+    /* Left padding to clear avatar */
+    border-radius: 20px;
+    position: relative;
+    z-index: 0;
+}
+
+.user-avatar {
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid var(--primary-teal-light);
+    object-fit: cover;
+    z-index: 2;
+    background-color: #ddd;
+    /* Placeholder color */
+}
+
+.user-name {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-add {
+    background-color: var(--white);
+    color: #000;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-remove {
+    background-color: var(--white);
+    color: red;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.tag {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--white);
+}
+
+.tag.orange {
+    background-color: var(--accent-orange);
+}
+
+.tag.blue {
+    background-color: var(--accent-blue);
+}
+
+.tag.purple {
+    background-color: var(--accent-purple);
+}
+
+.tag.cyan {
+    background-color: #00BCD4;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--primary-teal);
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 10px;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--primary-teal-light);
+    text-decoration: none;
+    font-size: 10px;
+    gap: 4px;
+}
+
+.nav-item.active {
+    color: #fff;
+    /* Active state color from screenshot (ish) */
+}
+
+.nav-item.active svg {
+    fill: rgba(255, 255, 255, 0.2);
+}
+
+.nav-profile-placeholder {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #fff;
+}
+
+/* Login Page Styles */
+.login-page {
+    background-color: var(--primary-teal);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 0;
+}
+
+.login-container {
+    background-color: var(--white);
+    width: 90%;
+    max-width: 400px;
+    padding: 40px 30px;
+    border-radius: 30px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header .logo-text {
+    font-size: 36px;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.input-group input {
+    padding: 12px 16px;
+    border: 2px solid #E5E7EB;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-teal);
+}
+
+.btn-primary {
+    background-color: var(--primary-teal);
+    color: var(--white);
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background-color: var(--dark-bg);
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--primary-teal);
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.error-message {
+    color: #DC2626;
+    font-size: 13px;
+    text-align: center;
+    min-height: 20px;
+}
+
+/* Logout Button Style */
+.logout-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn-logout {
+    background-color: #FEE2E2;
+    color: #B91C1C;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+}

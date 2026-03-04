@@ -118,6 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
             initProfile();
         } else if (path.includes('settings.html')) {
             initSettings();
+        } else if(path.includes("edit-profile.html")){
+            initEditProfile();
         }
     }
 
@@ -232,6 +234,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!uid) return;
 
+         // Button to get to Edit Profile
+        const editBtn = document.getElementById("editProfileBtn");
+        if (editBtn) {
+            editBtn.onclick = () => {
+                window.location.href = "edit-profile.html";
+            };
+        }
+
         const backNav = document.getElementById('backToFriends');
         if (backNav) backNav.onclick = () => window.history.back();
 
@@ -245,14 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Render categorized tags
                 renderCategorizedTags(userData.tags || []);
-
-                // Set Up Action Button
-                const actionBtn = document.getElementById('profileActionBtn');
-                if (actionBtn) {
-                    const isOwnProfile = auth.currentUser && uid === auth.currentUser.uid;
-                    actionBtn.textContent = isOwnProfile ? 'Edit Profile' : 'Remove Friend';
-                    actionBtn.className = isOwnProfile ? 'btn-edit-profile' : 'btn-remove-friend';
-                }
             }
         } catch (error) {
             console.error("Error loading profile:", error);
@@ -260,6 +262,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Connectivity for future uploader
         setupUploader();
+    }
+
+    async function initEditProfile() {
+        const backBtn = document.getElementById("backToProfile");
+        if (backBtn) {
+            backBtn.onclick = () => window.location.href = "profile.html";
+        }
+
+        if (!auth.currentUser) return;
+
+        // Load existing data
+        try {
+            const doc = await db.collection("users").doc(auth.currentUser.uid).get();
+            if (doc.exists) {
+                const data = doc.data();
+
+                const nameEl = document.getElementById("editName");
+                const bioEl = document.getElementById("editBio");
+                const programEl = document.getElementById("editProgram");
+                const avatarEl = document.getElementById("editAvatar");
+
+                if (nameEl) nameEl.value = data.name || "";
+                if (bioEl) bioEl.value = data.bio || "";
+                if (programEl) programEl.value = data.program || "None";
+                if (avatarEl && data.avatar) avatarEl.src = data.avatar;
+            }
+        } catch (e) {
+            console.error("Failed to load profile for editing:", e);
+        }
+
+        // Save handler
+        const saveBtn = document.getElementById("saveProfileBtn");
+        if (saveBtn) {
+            saveBtn.onclick = async () => {
+                const name = document.getElementById("editName")?.value ?? "";
+                const bio = document.getElementById("editBio")?.value ?? "";
+                const program = document.getElementById("editProgram")?.value ?? "None";
+
+                try {
+                    await db.collection("users").doc(auth.currentUser.uid).update({
+                        name,
+                        bio,
+                        program
+                    });
+
+                    const toast = document.getElementById("saveToast");
+                    if (toast) {
+                        toast.style.display = "block";
+                        toast.textContent = "Changes saved ✓";
+                        setTimeout(() => {
+                            toast.style.display = "none";
+                        }, 2500);
+                    }
+                } catch (e) {
+                    console.error("Failed to save profile changes:", e);
+                }
+            };
+        }
     }
 
     function renderCategorizedTags(tags) {

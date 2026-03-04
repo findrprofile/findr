@@ -66,6 +66,89 @@ body {
     align-items: center;
 }
 
+.edit-profile-btn {
+    position: absolute;
+    right: 60px;          
+    top: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border-radius: 9999px;
+    background: var(--white);
+    border: 2px solid var(--primary-cyan);
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.edit-form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.edit-label {
+    font-weight: 800;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.edit-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.edit-input {
+    width: 100%;
+    padding: 12px 40px 12px 12px;
+    border-radius: 12px;
+    border: 2px solid #E5E7EB;
+    font-size: 16px;
+}
+
+.edit-textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 2px solid #E5E7EB;
+    font-size: 16px;
+    resize: vertical;
+}
+
+.edit-icon {
+    position: absolute;
+    right: 12px;
+    font-size: 18px;
+    opacity: 0.6;
+    pointer-events: none; /* icon is visual only for now */
+}
+
+.btn-save-changes {
+    margin-top: 18px;
+    width: 100%;
+    padding: 14px;
+    background: var(--accent-red);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-full);
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.save-toast {
+    display: none;
+    background: #22C55E;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
 
 .notification-bell {
     position: absolute;

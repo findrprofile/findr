@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Profile - Findr</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="app-header">
+    <div class="header-main">
+      <div class="logo-text">Findr</div>
+      <div class="notification-bell">
+        <!-- keep bell for consistent UI -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <div id="backToProfile" class="back-nav" style="margin-bottom: 20px; cursor: pointer;">
+      <span style="font-size: 20px;">←</span>
+      <span style="font-size: 24px; font-weight: 500;">Return to Profile</span>
+    </div>
+
+    <section class="profile-section">
+      <!-- green success message -->
+      <div id="saveToast" class="save-toast">Changes saved ✓</div>
+
+      <div class="profile-header">
+        <div class="profile-avatar-container" style="width: 180px; height: 180px; border: 4px solid var(--primary-cyan);">
+          <img id="editAvatar" class="profile-avatar-large"
+            src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ij48L2NpcmNsZT48cGF0aCBkPSJNMjAgMjF2LTIgYTQgNCAwIDAgMC00LTRoLTggYTQgNCAwIDAgMC00IDR2MiI+PC9wYXRoPjwvc3ZnPg=="
+            alt="Profile Picture" />
+        </div>
+      </div>
+
+      <div class="edit-form">
+        <label class="edit-label">Name</label>
+        <div class="edit-row">
+          <input id="editName" class="edit-input" type="text" />
+          <span class="edit-icon">✎</span>
+        </div>
+
+        <label class="edit-label">Studying</label>
+        <div class="edit-row">
+          <select id="editProgram" class="edit-input">
+            <option value="None">None</option>
+          </select>
+          <span class="edit-icon">▾</span>
+        </div>
+
+        <label class="edit-label">Bio</label>
+        <textarea id="editBio" class="edit-textarea" rows="4" placeholder="Write something..."></textarea>
+
+        <button id="saveProfileBtn" class="btn-save-changes">Save changes</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

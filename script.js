@@ -42,7 +42,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
                 console.error("Login Error:", error);
-                authError.textContent = error.message;
+                // Error messages
+                if (error.code === "auth/wrong-password") {
+                    authError.textContent = "Invalid password.";
+                }
+                else if (error.code === "auth/user-not-found") {
+                    authError.textContent = "Email is not registered.";
+                }
+                else if (error.code === "auth/invalid-email") {
+                    authError.textContent = "Please enter a valid email address."
+                }
+                else {
+                    authError.textContent = "Login failed. Please try again."
+                }
             }
         });
     }
@@ -76,7 +88,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } catch (error) {
                 console.error("Signup Error:", error);
-                authError.textContent = error.message;
+                if (error.code === "auth/invalid-email") {
+                    authError.textContent = "Please enter a valid email address."
+                }
+                else if (error.code === "auth/email-already-in-use") {
+                    authError.textContent = "Email is already registered."
+                }
+                else if (error.code === "auth/weak-password") {
+                    authError.textContent = "Password must be at least 6 characters."
+                }
+                else {
+                    authError.textContent = "Signup failed. Please try again."
+                }
             }
         });
     }

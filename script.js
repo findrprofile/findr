@@ -7,19 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleAuthBtn = document.getElementById('toggleAuth');
     const loginBtn = document.getElementById('loginBtn');
 
-    // Notification bell navigation
-    function setupNotificationBell() {
-        const bells = document.querySelectorAll('.notification-bell');
-
-        if (!bells || bells.length === 0) return;
-
-        bells.forEach(bell => {
-            bell.addEventListener('click', () => {
-                window.location.href = 'notifications.html';
-            });
-        });
-    }
-    setupNotificationBell();
+    // Notification bell navigation is handled via HTML <a> tags.
 
     // Edit Profile button navigation 
     function setupEditProfileButton() {
@@ -134,8 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function initApp() {
         // App logic based on page
         const path = window.location.pathname;
+        console.log("Initializing app for path:", path);
 
-        if (path.includes('index.html') || path === '/') {
+        if (path.endsWith('index.html') || path.endsWith('/') || path === '') {
             initDashboard();
         } else if (path.includes('friends.html')) {
             initFriendsPage();
@@ -143,15 +132,23 @@ document.addEventListener('DOMContentLoaded', () => {
             initProfile();
         } else if (path.includes('settings.html')) {
             initSettings();
-        } else if(path.includes("edit-profile.html")){
+        } else if (path.includes("edit-profile.html")) {
             initEditProfile();
         } else if (path.includes('notifications.html')) {
             initNotifications();
+        } else {
+            // Default to dashboard if no match
+            console.log("No specific page match, defaulting to dashboard logic");
+            initDashboard();
         }
     }
 
     function initDashboard() {
-        // Dashboard can show stats or news in the future
+        // Update location display
+        const locDisplay = document.getElementById('currentLocationDisplay');
+        if (locDisplay) {
+            locDisplay.textContent = "MN";
+        }
         console.log("Dashboard initialized");
     }
 
@@ -167,26 +164,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function initSettings() {
+        console.log("Settings initialized");
         const locationToggle = document.getElementById('locationToggle');
+        const notificationToggle = document.getElementById('notificationToggle');
         const logoutBtn = document.getElementById('logoutBtnFull');
 
-        if (locationToggle && auth.currentUser) {
-            // Load current preference
-            const doc = await db.collection('users').doc(auth.currentUser.uid).get();
-            if (doc.exists && doc.data().locationTracking !== undefined) {
-                locationToggle.checked = doc.data().locationTracking;
+        if (auth.currentUser) {
+            const userRef = db.collection('users').doc(auth.currentUser.uid);
+            const doc = await userRef.get();
+            const userData = doc.exists ? doc.data() : {};
+
+            // Location Toggle logic
+            if (locationToggle) {
+                if (userData.locationTracking !== undefined) {
+                    locationToggle.checked = userData.locationTracking;
+                }
+                locationToggle.addEventListener('change', async () => {
+                    try {
+                        await userRef.update({ locationTracking: locationToggle.checked });
+                    } catch (e) { console.error(e); }
+                });
             }
 
-            locationToggle.addEventListener('change', async () => {
-                try {
-                    await db.collection('users').doc(auth.currentUser.uid).update({
-                        locationTracking: locationToggle.checked
-                    });
-                    console.log("Location tracking updated:", locationToggle.checked);
-                } catch (error) {
-                    console.error("Error updating tracking preference:", error);
+            // Notification Toggle logic
+            if (notificationToggle) {
+                if (userData.notificationsEnabled !== undefined) {
+                    notificationToggle.checked = userData.notificationsEnabled;
                 }
-            });
+                notificationToggle.addEventListener('change', async () => {
+                    try {
+                        await userRef.update({ notificationsEnabled: notificationToggle.checked });
+                        console.log("Notification preference updated");
+                    } catch (e) { console.error(e); }
+                });
+            }
         }
 
         if (logoutBtn) {
@@ -227,6 +238,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     userListEl.appendChild(card);
                 }
+            });
+
+            // Add Dummy Profiles
+            const dummyUsers = [
+                { id: 'dummy1', name: 'Alex Rivers', location: 'Maanjiwe Nendamowinan', time: '5m ago' },
+                { id: 'dummy2', name: 'Sam Chen', location: 'Hazel McCallion Academic Learning Centre', time: '12m ago' },
+                { id: 'dummy3', name: 'Jordan Smith', location: 'Deerfield Hall', time: 'Now' }
+            ];
+
+            dummyUsers.forEach(user => {
+                const card = createUserCard(user);
+                userListEl.appendChild(card);
             });
         } catch (error) {
             console.error("Error fetching users:", error);

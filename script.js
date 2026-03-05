@@ -21,6 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setupNotificationBell();
 
+    // Edit Profile button navigation 
+    function setupEditProfileButton() {
+        const btn = document.getElementById("editProfileBtn");
+        if (!btn) return;
+
+        btn.addEventListener("click", () => {
+            window.location.href = "edit-profile.html";
+        });
+    }
+    setupEditProfileButton();
+
     let isLoginMode = true;
 
     // --- Authentication Logic ---
@@ -256,14 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const uid = urlParams.get('uid') || (auth.currentUser ? auth.currentUser.uid : null);
 
         if (!uid) return;
-
-         // Button to get to Edit Profile
-        const editBtn = document.getElementById("editProfileBtn");
-        if (editBtn) {
-            editBtn.onclick = () => {
-                window.location.href = "edit-profile.html";
-            };
-        }
 
         const backNav = document.getElementById('backToFriends');
         if (backNav) backNav.onclick = () => window.history.back();

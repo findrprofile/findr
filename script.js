@@ -167,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Settings initialized");
         const locationToggle = document.getElementById('locationToggle');
         const notificationToggle = document.getElementById('notificationToggle');
+        const privacyToggle = document.getElementById('privacyToggle');
         const logoutBtn = document.getElementById('logoutBtnFull');
 
         if (auth.currentUser) {
@@ -198,18 +199,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     } catch (e) { console.error(e); }
                 });
             }
+
+            // Privacy Toggle logic
+            if (privacyToggle) {
+                if (userData.privacyMode !== undefined) {
+                    privacyToggle.checked = userData.privacyMode;
+                }
+                privacyToggle.addEventListener('change', async () => {
+                    try {
+                        await userRef.update({ privacyMode: privacyToggle.checked });
+                        console.log("Privacy preference updated");
+                    } catch (e) {
+                        // Fallback for demo
+                        localStorage.setItem('privacyMode', privacyToggle.checked);
+                        console.log("Privacy preference saved to local storage");
+                    }
+                });
+            }
         }
 
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', async () => {
+            logoutBtn.onclick = async () => {
                 if (confirm('Are you sure you want to log out?')) {
-                    try {
-                        await auth.signOut();
-                    } catch (error) {
-                        console.error("Logout Error:", error);
-                    }
+                    window.location.href = 'login.html';
                 }
-            });
+            };
         }
     }
 
@@ -242,9 +256,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Add Dummy Profiles
             const dummyUsers = [
-                { id: 'dummy1', name: 'Alex Rivers', location: 'Maanjiwe Nendamowinan', time: '5m ago' },
-                { id: 'dummy2', name: 'Sam Chen', location: 'Hazel McCallion Academic Learning Centre', time: '12m ago' },
-                { id: 'dummy3', name: 'Jordan Smith', location: 'Deerfield Hall', time: 'Now' }
+                {
+                    id: 'dummy1',
+                    name: 'Yousef Sadiq',
+                    location: 'Maanjiwe Nendamowinan',
+                    time: '5m ago',
+                    interests: ['Video Games', 'Computer Science', 'Library', 'Strength Training', 'UX Design', 'DV', 'Movies']
+                },
+                {
+                    id: 'dummy2',
+                    name: 'Sam Chen',
+                    location: 'Hazel McCallion Academic Learning Centre',
+                    time: '12m ago',
+                    interests: ['Art', 'Design', 'Music', 'Hiking']
+                },
+                {
+                    id: 'dummy3',
+                    name: 'Jordan Smith',
+                    location: 'Deerfield Hall',
+                    time: 'Now',
+                    interests: ['Coding', 'Coffee', 'Startups']
+                }
             ];
 
             dummyUsers.forEach(user => {
@@ -257,32 +289,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function createUserCard(user) {
-        const container = document.createElement('div');
-        container.style.cssText = 'display: flex; align-items: center; gap: 15px; margin-bottom: 20px; cursor: pointer;';
-        container.onclick = () => window.location.href = `profile.html?uid=${user.id}`;
+        const card = document.createElement('div');
+        card.className = 'friend-card-v2';
+        card.onclick = () => window.location.href = `profile.html?uid=${user.id}`;
+
+        const header = document.createElement('div');
+        header.className = 'card-header-v2';
 
         const avatar = document.createElement('img');
+        avatar.className = 'card-avatar-v2';
         avatar.src = user.avatar || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ij48L2NpcmNsZT48cGF0aCBkPSJNMjAgMjF2LTIgYTQgNCAwIDAgMC00LTRoLTggYTQgNCAwIDAgMC00IDR2MiI+PC9wYXRoPjwvc3ZnPg==';
-        avatar.style.cssText = 'width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary-cyan); object-fit: cover;';
 
         const info = document.createElement('div');
+        info.className = 'card-info-v2';
 
         const name = document.createElement('div');
+        name.className = 'card-name-v2';
         name.textContent = user.name;
-        name.style.fontWeight = '800';
-        name.style.fontSize = '18px';
-
-        const locationText = document.createElement('div');
-        locationText.textContent = `${user.location} • ${user.time}`;
-        locationText.style.fontSize = '14px';
-        locationText.style.color = '#555';
 
         info.appendChild(name);
-        info.appendChild(locationText);
-        container.appendChild(avatar);
-        container.appendChild(info);
+        header.appendChild(avatar);
+        header.appendChild(info);
 
-        return container;
+        const actions = document.createElement('div');
+        actions.className = 'card-actions-v2';
+        actions.innerHTML = `
+            <button class="btn-card-add" onclick="event.stopPropagation();">Add +</button>
+            <div class="btn-card-remove" onclick="event.stopPropagation();">−</div>
+        `;
+
+        const tagsContainer = document.createElement('div');
+        tagsContainer.className = 'tags-container-v2';
+
+        const tagColors = ['orange', 'blue', 'purple', 'teal', 'magenta', 'dark-blue'];
+        const interests = user.interests || ['General'];
+
+        interests.forEach((interest, index) => {
+            const tag = document.createElement('span');
+            const colorClass = `tag-${tagColors[index % tagColors.length]}`;
+            tag.className = `tag-v2 ${colorClass}`;
+            tag.textContent = interest;
+            tagsContainer.appendChild(tag);
+        });
+
+        card.appendChild(header);
+        card.appendChild(actions);
+        card.appendChild(tagsContainer);
+
+        return card;
     }
 
     async function initProfile() {
@@ -296,15 +350,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const doc = await db.collection('users').doc(uid).get();
-            if (doc.exists) {
-                const userData = doc.data();
-                document.getElementById('userNameDisplay').textContent = userData.name || userData.email.split('@')[0];
-                if (userData.avatar) document.getElementById('userAvatar').src = userData.avatar;
-                if (userData.bio) document.getElementById('userBioDisplay').textContent = userData.bio;
+            const userData = doc.exists ? doc.data() : { name: "Yousef Sadiq", bio: "Co-Founder of Findr, avid procrastinator." };
 
-                // Render categorized tags
-                renderCategorizedTags(userData.tags || []);
+            document.getElementById('userNameDisplay').textContent = userData.name || "Yousef Sadiq";
+
+            // Force new demo picture if we are on the demo profile or testing
+            if (!userData.avatar || userData.name === "Yousef Sadiq") {
+                document.getElementById('userAvatar').src = "youssef-mog.jpg";
+            } else {
+                document.getElementById('userAvatar').src = userData.avatar;
             }
+
+            document.getElementById('userBioDisplay').textContent = userData.bio || "Co-Founder of Findr, avid procrastinator.";
+
+            // Render categorized tags
+            renderCategorizedTags(userData.tags && userData.tags.length > 0 ? userData.tags : [
+                "Basketball", "Finance", "Video Games", "Strength Training", "Movies", "Food",
+                "Graphic Design", "Math", "Computer Science", "UX Design", "Game Design",
+                "Library", "DV", "DH"
+            ]);
         } catch (error) {
             console.error("Error loading profile:", error);
         }

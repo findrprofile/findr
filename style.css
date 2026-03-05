@@ -5,6 +5,12 @@
     --accent-orange: #FFA000;
     --accent-blue: #03A9F4;
     --accent-purple: #7E57C2;
+    --tag-orange: #ff9800;
+    --tag-blue: #03a9f4;
+    --tag-purple: #9c27b0;
+    --tag-teal: #00bcd4;
+    --tag-magenta: #e91e63;
+    --tag-dark-blue: #1565c0;
     --accent-red: #EF5350;
     --white: #FFFFFF;
     --text-primary: #000000;
@@ -333,16 +339,145 @@ body {
     background-color: var(--accent-orange);
 }
 
-.tag.blue {
-    background-color: var(--accent-blue);
+.tag-dark-blue {
+    background-color: var(--tag-dark-blue);
 }
 
-.tag.purple {
-    background-color: var(--accent-purple);
+/* Friends Tab Redesign V2 */
+.user-list-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 0;
 }
 
-.tag.cyan {
-    background-color: #00BCD4;
+.friend-card-v2 {
+    background-color: #006064 !important;
+    /* Dark Teal */
+    border-radius: 24px;
+    padding: 15px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    color: white !important;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.card-header-v2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.card-avatar-v2 {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #00dae3;
+    object-fit: cover;
+}
+
+.card-info-v2 {
+    flex: 1;
+}
+
+.card-name-v2 {
+    background: black;
+    color: white;
+    display: inline-block;
+    padding: 2px 15px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.card-actions-v2 {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-card-add {
+    background: white;
+    color: black;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-weight: 800;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-card-remove {
+    background: white;
+    color: red;
+    border: 2px solid black;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 20px;
+}
+
+.tags-container-v2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag-v2 {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: capitalize;
+    color: white;
+}
+
+.tag-orange {
+    background-color: var(--tag-orange);
+}
+
+.tag-blue {
+    background-color: var(--tag-blue);
+}
+
+.tag-purple {
+    background-color: var(--tag-purple);
+}
+
+.tag-teal {
+    background-color: var(--tag-teal);
+}
+
+.tag-magenta {
+    background-color: var(--tag-magenta);
+}
+
+.tag-dark-blue {
+    background-color: var(--tag-dark-blue);
+}
+
+.back-to-dashboard {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #111;
+    font-weight: 700;
+    font-size: 24px;
+    margin-bottom: 25px;
 }
 
 /* Bottom Nav */
@@ -384,6 +519,15 @@ body {
     width: 60px;
     height: 60px;
     top: -15px;
+}
+
+.nav-item.active .nav-icon-cont.app-header {
+    background-color: var(--white);
+    padding: 5px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .nav-item span {
@@ -491,6 +635,34 @@ input:checked+.slider:before {
     cursor: pointer;
 }
 
+/* Profile Section */
+.profile-section {
+    padding: 20px;
+}
+
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-avatar-container {
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f0f0f0;
+}
+
+.profile-avatar-large {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 /* Profile Badge Colors */
 .interest-title {
     color: var(--accent-orange);
@@ -584,11 +756,11 @@ input:checked+.slider:before {
 
 .login-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
 }
 
 .login-header .logo-container {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     display: flex;
     justify-content: center;
 }

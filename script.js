@@ -7,6 +7,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleAuthBtn = document.getElementById('toggleAuth');
     const loginBtn = document.getElementById('loginBtn');
 
+    // Notification bell navigation
+    function setupNotificationBell() {
+        const bells = document.querySelectorAll('.notification-bell');
+
+        if (!bells || bells.length === 0) return;
+
+        bells.forEach(bell => {
+            bell.addEventListener('click', () => {
+                window.location.href = 'notifications.html';
+            });
+        });
+    }
+    setupNotificationBell();
+
     let isLoginMode = true;
 
     // --- Authentication Logic ---
@@ -120,6 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
             initSettings();
         } else if(path.includes("edit-profile.html")){
             initEditProfile();
+        } else if (path.includes('notifications.html')) {
+            initNotifications();
         }
     }
 
@@ -130,6 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initFriendsPage() {
         renderUsers();
+    }
+
+    function initNotifications() {
+        const backBtn = document.getElementById("backToPrevious");
+        if (backBtn) {
+            backBtn.onclick = () => window.history.back();
+        }
     }
 
     async function initSettings() {

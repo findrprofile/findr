@@ -343,6 +343,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (e) {
                     console.error("Failed to save profile changes:", e);
+                    if (toast) {
+                        toast.style.display = "block";
+                        toast.textContent = "Save failed";
+                        setTimeout(() => toast.style.display = "none", 3000);
+                    }
                 }
             };
         }

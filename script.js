@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     locationTracking: true,
                     notificationsEnabled: true,
                     privacyMode: false,
+                    friends: [],
                     tags: {
                         interests: [],
                         education: [],

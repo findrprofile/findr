@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Findr - Location Based Social</title>
+    <!-- Redirect unauthenticated visitors to login immediately -->
+    <script>
+        // Fast redirect before Firebase loads — script.js also handles auth-based redirect
+        if (!sessionStorage.getItem('findr_authed')) {
+            window.location.replace('login.html');
+        }
+    </script>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

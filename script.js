@@ -1,6 +1,14 @@
 // Firebase initialization is now handled in firebase-config.js (excluded from git)
 
-document.addEventListener('DOMContentLoaded', () => {
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Ensure login is required for each session (or even more strictly)
+    try {
+        await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+    } catch (e) {
+        console.error("Persistence error:", e);
+    }
+
     // DOM Elements
     const loginForm = document.getElementById('loginForm');
     const authError = document.getElementById('authError');
@@ -21,23 +29,45 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEditProfileButton();
 
     let isLoginMode = true;
+    // Flag: true when user just submitted the login form, prevents sign-out loop
+    let justLoggedIn = false;
 
     // --- Authentication Logic ---
 
     // Check Auth State
-    auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(async user => {
         const path = window.location.pathname;
-        const isAuthPage = path.includes('login.html') || path.includes('signup.html');
+        const isLoginPage = path.includes('login.html');
+        const isSignupPage = path.includes('signup.html');
+        const isAuthPage = isLoginPage || isSignupPage;
+
+        console.log("Auth state changed. User:", user ? user.email : "None", "Path:", path);
 
         if (user) {
-            console.log("User is logged in:", user.email);
-            if (isAuthPage) {
-                window.location.href = 'index.html';
+            if (isLoginPage && !justLoggedIn) {
+                // User landed on login page with an existing session — force re-login
+                console.log("Forcing re-login: signing out existing session...");
+                await auth.signOut();
+                return;
             }
+
+            if (isAuthPage) {
+                // Fresh login or signup complete — redirect to dashboard
+                console.log("Redirecting to dashboard...");
+                justLoggedIn = false;
+                sessionStorage.setItem('findr_authed', '1');
+                window.location.href = 'index.html';
+                return;
+            }
+            sessionStorage.setItem('findr_authed', '1');
             initApp();
         } else {
-            console.log("No user logged in.");
-            if (!isAuthPage) {
+            // Check if we are not on an auth page and not on a root path
+            const isHomePage = path.endsWith('index.html') || path.endsWith('/') || path === '';
+            if (!isAuthPage && !isHomePage) {
+                console.log("Not on auth page and not logged in, redirecting to login...");
+                window.location.href = 'login.html';
+            } else if (isHomePage) {
                 window.location.href = 'login.html';
             }
         }
@@ -52,12 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
             authError.textContent = '';
 
             try {
+                justLoggedIn = true; // Prevent onAuthStateChanged from signing out after login
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
+                justLoggedIn = false; // Reset flag on failure
                 console.error("Login Error:", error);
                 // Error messages
-                if (error.code === "auth/wrong-password") {
-                    authError.textContent = "Invalid password.";
+                if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
+                    authError.textContent = "Invalid email or password.";
                 }
                 else if (error.code === "auth/user-not-found") {
                     authError.textContent = "Email is not registered.";
@@ -96,20 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await db.collection('users').doc(userCredential.user.uid).set({
                     email: email,
                     name: displayName,
-                    bio: "",
-                    program: "",
-                    avatar: "",
-                    location: "MN",
-                    locationTracking: true,
-                    notificationsEnabled: true,
-                    privacyMode: false,
-                    friends: [],
-                    tags: {
-                        interests: [],
-                        education: [],
-                        skills: [],
-                        hangoutSpots: []
-                    },
+                    tags: [],
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
@@ -236,9 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (confirm('Are you sure you want to log out?')) {
                     try {
                         await auth.signOut();
+                        sessionStorage.removeItem('findr_authed');
+                        console.log("User signed out successfully");
                         window.location.href = 'login.html';
-                    } catch (e) {
-                        console.error("Logout error:", e);
+                    } catch (error) {
+                        console.error("Logout Error:", error);
+                        alert("Failed to log out. Please try again.");
                     }
                 }
             };
@@ -448,11 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (e) {
                     console.error("Failed to save profile changes:", e);
-                    if (toast) {
-                        toast.style.display = "block";
-                        toast.textContent = "Save failed";
-                        setTimeout(() => toast.style.display = "none", 3000);
-                    }
                 }
             };
         }

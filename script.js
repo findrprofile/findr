@@ -96,7 +96,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 await db.collection('users').doc(userCredential.user.uid).set({
                     email: email,
                     name: displayName,
-                    tags: [],
+                    bio: "",
+                    program: "",
+                    avatar: "",
+                    location: "MN",
+                    locationTracking: true,
+                    notificationsEnabled: true,
+                    privacyMode: false,
+                    tags: {
+                        interests: [],
+                        education: [],
+                        skills: [],
+                        hangoutSpots: []
+                    },
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
@@ -221,7 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (logoutBtn) {
             logoutBtn.onclick = async () => {
                 if (confirm('Are you sure you want to log out?')) {
-                    window.location.href = 'login.html';
+                    try {
+                        await auth.signOut();
+                        window.location.href = 'login.html';
+                    } catch (e) {
+                        console.error("Logout error:", e);
+                    }
                 }
             };
         }

@@ -2,7 +2,29 @@
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Ensure login is required for each session (or even more strictly)
+    // ─── All available tags — defined FIRST so they're always available ────────
+    const ALL_TAGS = {
+        interests: [
+            'Basketball', 'Soccer', 'Tennis', 'Running', 'Hiking',
+            'Video Games', 'Movies', 'Music', 'Reading', 'Photography',
+            'Finance', 'Food', 'Strength Training', 'Yoga', 'Cooking',
+            'Automobiles', 'Fashion', 'Travel', 'Gaming', 'Anime'
+        ],
+        skills: [
+            'Computer Science', 'Math', 'Statistics', 'Physics', 'Biology',
+            'Chemistry', 'UX Design', 'Graphic Design', 'Game Design',
+            'Web Development', 'Data Science', 'Machine Learning',
+            'Economics', 'Psychology', 'Business', 'Marketing', 'Finance',
+            'Architecture', 'Art', 'Writing'
+        ],
+        hangout: [
+            'Library', 'DV', 'DH', 'Maanjiwe Nendamowinan', 'Hazel McCallion',
+            'RAWC', 'Cafeteria', 'Innovation Complex', 'Student Centre',
+            'CCT Building', 'Online / Discord', 'Off-Campus', 'Tim Hortons'
+        ]
+    };
+
+    // Ensure login is required for each session
     try {
         await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
     } catch (e) {
@@ -12,7 +34,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // DOM Elements
     const loginForm = document.getElementById('loginForm');
     const authError = document.getElementById('authError');
-    const loginBtn = document.getElementById('loginBtn');
 
     // Edit Profile button navigation
     function setupEditProfileButton() {
@@ -24,7 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     setupEditProfileButton();
 
-    let isLoginMode = true;
     let justLoggedIn = false;
 
     // --- Authentication Logic ---
@@ -410,12 +430,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const myUid = auth.currentUser.uid;
+            // Fetch all pending, filter client-side (avoids composite index requirement)
             const snap = await db.collection('users').doc(myUid).collection('friends')
                 .where('status', '==', 'pending')
-                .where('initiator', '!=', myUid)
                 .get();
+            // Only show requests where someone ELSE initiated (i.e. incoming)
+            const incoming = snap.docs.filter(d => d.data().initiator !== myUid);
 
-            if (snap.empty) {
+            if (incoming.length === 0) {
                 banner.style.display = 'none';
                 return;
             }
@@ -423,7 +445,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             banner.style.display = '';
             list.innerHTML = '';
 
-            for (const reqDoc of snap.docs) {
+            for (const reqDoc of incoming) {
                 const fromUid = reqDoc.id;
                 const uDoc = await db.collection('users').doc(fromUid).get();
                 const name = uDoc.exists ? (uDoc.data().name || fromUid) : fromUid;
@@ -572,26 +594,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             const doc = await db.collection('users').doc(uid).get();
 
             let userData;
-            if (doc.exists && doc.data().name) {
+            if (doc.exists) {
                 userData = doc.data();
             } else {
-                // Uid not in DB — show a graceful fallback (e.g. dummy profile)
                 userData = {
-                    name: 'Unknown User',
+                    name: 'No profile found',
                     bio: '',
                     avatar: '',
                     tags: []
                 };
             }
 
-            document.getElementById('userNameDisplay').textContent = userData.name || 'User';
+            const nameEl = document.getElementById('userNameDisplay');
+            if (nameEl) nameEl.textContent = userData.name || 'User';
 
             const avatarEl = document.getElementById('userAvatar');
             if (avatarEl) {
                 avatarEl.src = userData.avatar || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ij48L2NpcmNsZT48cGF0aCBkPSJNMjAgMjF2LTIgYTQgNCAwIDAgMC00LTRoLTggYTQgNCAwIDAgMC00IDR2MiI+PC9wYXRoPjwvc3ZnPg==';
             }
 
-            document.getElementById('userBioDisplay').textContent = userData.bio || 'No bio yet.';
+            const bioEl = document.getElementById('userBioDisplay');
+            if (bioEl) bioEl.textContent = userData.bio || 'No bio yet.';
 
             const tags = userData.tags && userData.tags.length > 0 ? userData.tags : [];
             renderCategorizedTags(tags);
@@ -604,28 +627,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ─── EDIT PROFILE ───────────────────────────────────────────────────────────
-
-    // All available tags for the selector
-    const ALL_TAGS = {
-        interests: [
-            'Basketball', 'Soccer', 'Tennis', 'Running', 'Hiking',
-            'Video Games', 'Movies', 'Music', 'Reading', 'Photography',
-            'Finance', 'Food', 'Strength Training', 'Yoga', 'Cooking',
-            'Automobiles', 'Fashion', 'Travel', 'Gaming', 'Anime'
-        ],
-        skills: [
-            'Computer Science', 'Math', 'Statistics', 'Physics', 'Biology',
-            'Chemistry', 'UX Design', 'Graphic Design', 'Game Design',
-            'Web Development', 'Data Science', 'Machine Learning',
-            'Economics', 'Psychology', 'Business', 'Marketing', 'Finance',
-            'Architecture', 'Art', 'Writing'
-        ],
-        hangout: [
-            'Library', 'DV', 'DH', 'Maanjiwe Nendamowinan', 'Hazel McCallion',
-            'RAWC', 'Cafeteria', 'Innovation Complex', 'Student Centre',
-            'CCT Building', 'Online / Discord', 'Off-Campus', 'Tim Hortons'
-        ]
-    };
 
     async function initEditProfile() {
         const backBtn = document.getElementById("backToProfile");

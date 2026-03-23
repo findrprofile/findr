@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Edit Profile - Findr</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -15,7 +18,6 @@
         <img src="logo.jpg" alt="Findr Logo" class="app-logo">
       </div>
       <a href="notifications.html" class="notification-bell">
-        <!-- keep bell for consistent UI -->
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -33,7 +35,7 @@
     </a>
 
     <section class="profile-section">
-      <!-- green success message -->
+      <!-- success toast -->
       <div id="saveToast" class="save-toast">Changes saved ✓</div>
 
       <div class="profile-header">
@@ -48,7 +50,7 @@
       <div class="edit-form">
         <label class="edit-label">Name</label>
         <div class="edit-row">
-          <input id="editName" class="edit-input" type="text" />
+          <input id="editName" class="edit-input" type="text" placeholder="Your name" />
           <span class="edit-icon">✎</span>
         </div>
 
@@ -56,12 +58,31 @@
         <div class="edit-row">
           <select id="editProgram" class="edit-input">
             <option value="None">None</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Mathematical Sciences">Mathematical Sciences</option>
+            <option value="Statistics">Statistics</option>
+            <option value="Biology">Biology</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Physics">Physics</option>
+            <option value="Psychology">Psychology</option>
+            <option value="Economics">Economics</option>
+            <option value="Management">Management</option>
+            <option value="Sociology">Sociology</option>
+            <option value="Communication, Culture and Technology">Communication, Culture and Technology</option>
+            <option value="Art and Art History">Art and Art History</option>
+            <option value="English">English</option>
+            <option value="Other">Other</option>
           </select>
           <span class="edit-icon">▾</span>
         </div>
 
         <label class="edit-label">Bio</label>
-        <textarea id="editBio" class="edit-textarea" rows="4" placeholder="Write something..."></textarea>
+        <textarea id="editBio" class="edit-textarea" rows="3" placeholder="Write something about yourself..."></textarea>
+
+        <!-- Tag selector -->
+        <label class="edit-label" style="margin-top: 24px;">Your Tags</label>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 12px;">Tap to select. These show on your profile.</p>
+        <div id="tagSelectorContainer"></div>
 
         <button id="saveProfileBtn" type="button" class="btn-save-changes">Save changes</button>
       </div>

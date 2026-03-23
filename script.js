@@ -12,16 +12,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // DOM Elements
     const loginForm = document.getElementById('loginForm');
     const authError = document.getElementById('authError');
-    const toggleAuthBtn = document.getElementById('toggleAuth');
     const loginBtn = document.getElementById('loginBtn');
 
-    // Notification bell navigation is handled via HTML <a> tags.
-
-    // Edit Profile button navigation 
+    // Edit Profile button navigation
     function setupEditProfileButton() {
         const btn = document.getElementById("editProfileBtn");
         if (!btn) return;
-
         btn.addEventListener("click", () => {
             window.location.href = "edit-profile.html";
         });
@@ -29,12 +25,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEditProfileButton();
 
     let isLoginMode = true;
-    // Flag: true when user just submitted the login form, prevents sign-out loop
     let justLoggedIn = false;
 
     // --- Authentication Logic ---
 
-    // Check Auth State
     auth.onAuthStateChanged(async user => {
         const path = window.location.pathname;
         const isLoginPage = path.includes('login.html');
@@ -45,14 +39,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (user) {
             if (isLoginPage && !justLoggedIn) {
-                // User landed on login page with an existing session — force re-login
                 console.log("Forcing re-login: signing out existing session...");
                 await auth.signOut();
                 return;
             }
 
             if (isAuthPage) {
-                // Fresh login or signup complete — redirect to dashboard
                 console.log("Redirecting to dashboard...");
                 justLoggedIn = false;
                 sessionStorage.setItem('findr_authed', '1');
@@ -62,7 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             sessionStorage.setItem('findr_authed', '1');
             initApp();
         } else {
-            // Check if we are not on an auth page and not on a root path
             const isHomePage = path.endsWith('index.html') || path.endsWith('/') || path === '';
             if (!isAuthPage && !isHomePage) {
                 console.log("Not on auth page and not logged in, redirecting to login...");
@@ -82,23 +73,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             authError.textContent = '';
 
             try {
-                justLoggedIn = true; // Prevent onAuthStateChanged from signing out after login
+                justLoggedIn = true;
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
-                justLoggedIn = false; // Reset flag on failure
+                justLoggedIn = false;
                 console.error("Login Error:", error);
-                // Error messages
                 if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
                     authError.textContent = "Invalid email or password.";
-                }
-                else if (error.code === "auth/user-not-found") {
+                } else if (error.code === "auth/user-not-found") {
                     authError.textContent = "Email is not registered.";
-                }
-                else if (error.code === "auth/invalid-email") {
-                    authError.textContent = "Please enter a valid email address."
-                }
-                else {
-                    authError.textContent = "Login failed. Please try again."
+                } else if (error.code === "auth/invalid-email") {
+                    authError.textContent = "Please enter a valid email address.";
+                } else {
+                    authError.textContent = "Login failed. Please try again.";
                 }
             }
         });
@@ -116,7 +103,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             authError.textContent = '';
 
-            // Domain Validation
             if (!email.endsWith('@mail.utoronto.ca')) {
                 authError.textContent = 'Only @mail.utoronto.ca emails are allowed.';
                 return;
@@ -124,26 +110,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                // Create user profile in Firestore
                 await db.collection('users').doc(userCredential.user.uid).set({
                     email: email,
                     name: displayName,
+                    bio: '',
+                    program: 'None',
                     tags: [],
+                    avatar: '',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) {
                 console.error("Signup Error:", error);
                 if (error.code === "auth/invalid-email") {
-                    authError.textContent = "Please enter a valid email address."
-                }
-                else if (error.code === "auth/email-already-in-use") {
-                    authError.textContent = "Email is already registered."
-                }
-                else if (error.code === "auth/weak-password") {
-                    authError.textContent = "Password must be at least 6 characters."
-                }
-                else {
-                    authError.textContent = "Signup failed. Please try again."
+                    authError.textContent = "Please enter a valid email address.";
+                } else if (error.code === "auth/email-already-in-use") {
+                    authError.textContent = "Email is already registered.";
+                } else if (error.code === "auth/weak-password") {
+                    authError.textContent = "Password must be at least 6 characters.";
+                } else {
+                    authError.textContent = "Signup failed. Please try again.";
                 }
             }
         });
@@ -152,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- App Logic ---
 
     function initApp() {
-        // App logic based on page
         const path = window.location.pathname;
         console.log("Initializing app for path:", path);
 
@@ -169,30 +153,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (path.includes('notifications.html')) {
             initNotifications();
         } else {
-            // Default to dashboard if no match
-            console.log("No specific page match, defaulting to dashboard logic");
             initDashboard();
         }
     }
 
     function initDashboard() {
-        // Update location display
         const locDisplay = document.getElementById('currentLocationDisplay');
-        if (locDisplay) {
-            locDisplay.textContent = "MN";
-        }
+        if (locDisplay) locDisplay.textContent = "MN";
         console.log("Dashboard initialized");
-    }
-
-    function initFriendsPage() {
-        renderUsers();
     }
 
     function initNotifications() {
         const backBtn = document.getElementById("backToPrevious");
-        if (backBtn) {
-            backBtn.onclick = () => window.history.back();
-        }
+        if (backBtn) backBtn.onclick = () => window.history.back();
     }
 
     async function initSettings() {
@@ -207,44 +180,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             const doc = await userRef.get();
             const userData = doc.exists ? doc.data() : {};
 
-            // Location Toggle logic
             if (locationToggle) {
-                if (userData.locationTracking !== undefined) {
-                    locationToggle.checked = userData.locationTracking;
-                }
+                if (userData.locationTracking !== undefined) locationToggle.checked = userData.locationTracking;
                 locationToggle.addEventListener('change', async () => {
-                    try {
-                        await userRef.update({ locationTracking: locationToggle.checked });
-                    } catch (e) { console.error(e); }
+                    try { await userRef.update({ locationTracking: locationToggle.checked }); } catch (e) { console.error(e); }
                 });
             }
 
-            // Notification Toggle logic
             if (notificationToggle) {
-                if (userData.notificationsEnabled !== undefined) {
-                    notificationToggle.checked = userData.notificationsEnabled;
-                }
+                if (userData.notificationsEnabled !== undefined) notificationToggle.checked = userData.notificationsEnabled;
                 notificationToggle.addEventListener('change', async () => {
-                    try {
-                        await userRef.update({ notificationsEnabled: notificationToggle.checked });
-                        console.log("Notification preference updated");
-                    } catch (e) { console.error(e); }
+                    try { await userRef.update({ notificationsEnabled: notificationToggle.checked }); } catch (e) { console.error(e); }
                 });
             }
 
-            // Privacy Toggle logic
             if (privacyToggle) {
-                if (userData.privacyMode !== undefined) {
-                    privacyToggle.checked = userData.privacyMode;
-                }
+                if (userData.privacyMode !== undefined) privacyToggle.checked = userData.privacyMode;
                 privacyToggle.addEventListener('change', async () => {
-                    try {
-                        await userRef.update({ privacyMode: privacyToggle.checked });
-                        console.log("Privacy preference updated");
-                    } catch (e) {
-                        // Fallback for demo
+                    try { await userRef.update({ privacyMode: privacyToggle.checked }); } catch (e) {
                         localStorage.setItem('privacyMode', privacyToggle.checked);
-                        console.log("Privacy preference saved to local storage");
                     }
                 });
             }
@@ -256,10 +210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     try {
                         await auth.signOut();
                         sessionStorage.removeItem('findr_authed');
-                        console.log("User signed out successfully");
                         window.location.href = 'login.html';
                     } catch (error) {
-                        console.error("Logout Error:", error);
                         alert("Failed to log out. Please try again.");
                     }
                 }
@@ -267,68 +219,243 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Render Users from Firestore
-    async function renderUsers() {
+    // ─── FRIENDS SYSTEM ────────────────────────────────────────────────────────
+
+    /**
+     * Returns a map of { [uid]: 'pending_outgoing' | 'pending_incoming' | 'accepted' }
+     * for all users this person has a relationship with.
+     */
+    async function getFriendStatuses() {
+        if (!auth.currentUser) return {};
+        const myUid = auth.currentUser.uid;
+        const snap = await db.collection('users').doc(myUid).collection('friends').get();
+        const map = {};
+        snap.forEach(doc => {
+            const data = doc.data();
+            if (data.status === 'accepted') {
+                map[doc.id] = 'accepted';
+            } else if (data.status === 'pending') {
+                // if I initiated, it's outgoing; otherwise incoming
+                map[doc.id] = data.initiator === myUid ? 'pending_outgoing' : 'pending_incoming';
+            }
+        });
+        return map;
+    }
+
+    async function sendFriendRequest(targetUid) {
+        if (!auth.currentUser) return;
+        const myUid = auth.currentUser.uid;
+        const batch = db.batch();
+
+        // My record: I initiated
+        batch.set(
+            db.collection('users').doc(myUid).collection('friends').doc(targetUid),
+            { status: 'pending', initiator: myUid, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }
+        );
+        // Their record: they received
+        batch.set(
+            db.collection('users').doc(targetUid).collection('friends').doc(myUid),
+            { status: 'pending', initiator: myUid, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }
+        );
+
+        await batch.commit();
+    }
+
+    async function acceptFriendRequest(fromUid) {
+        if (!auth.currentUser) return;
+        const myUid = auth.currentUser.uid;
+        const batch = db.batch();
+
+        batch.update(
+            db.collection('users').doc(myUid).collection('friends').doc(fromUid),
+            { status: 'accepted', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }
+        );
+        batch.update(
+            db.collection('users').doc(fromUid).collection('friends').doc(myUid),
+            { status: 'accepted', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }
+        );
+
+        await batch.commit();
+    }
+
+    async function removeFriend(targetUid) {
+        if (!auth.currentUser) return;
+        const myUid = auth.currentUser.uid;
+        const batch = db.batch();
+
+        batch.delete(db.collection('users').doc(myUid).collection('friends').doc(targetUid));
+        batch.delete(db.collection('users').doc(targetUid).collection('friends').doc(myUid));
+
+        await batch.commit();
+    }
+
+    // ─── FRIENDS PAGE ───────────────────────────────────────────────────────────
+
+    async function initFriendsPage() {
+        const discoverTab = document.getElementById('tabDiscover');
+        const myFriendsTab = document.getElementById('tabMyFriends');
+        const discoverPanel = document.getElementById('panelDiscover');
+        const myFriendsPanel = document.getElementById('panelMyFriends');
+
+        function switchTab(tab) {
+            if (tab === 'discover') {
+                discoverTab.classList.add('active');
+                myFriendsTab.classList.remove('active');
+                discoverPanel.style.display = '';
+                myFriendsPanel.style.display = 'none';
+            } else {
+                myFriendsTab.classList.add('active');
+                discoverTab.classList.remove('active');
+                myFriendsPanel.style.display = '';
+                discoverPanel.style.display = 'none';
+            }
+        }
+
+        if (discoverTab) discoverTab.addEventListener('click', () => switchTab('discover'));
+        if (myFriendsTab) myFriendsTab.addEventListener('click', () => switchTab('my-friends'));
+
+        await renderDiscover();
+        await renderMyFriends();
+        await renderIncomingRequests();
+    }
+
+    async function renderDiscover() {
         const userListEl = document.getElementById('userList');
         if (!userListEl) return;
 
         userListEl.innerHTML = '<div class="loading-users">Searching for people nearby...</div>';
 
         try {
-            // Only show users who have location tracking enabled (if we were being real)
-            // For now, show everyone except self
+            const friendStatuses = await getFriendStatuses();
             const snapshot = await db.collection('users').get();
             userListEl.innerHTML = '';
 
             snapshot.forEach(doc => {
                 const userData = doc.data();
-                if (auth.currentUser && userData.email !== auth.currentUser.email) {
+                if (auth.currentUser && doc.id !== auth.currentUser.uid) {
+                    const status = friendStatuses[doc.id] || null;
                     const card = createUserCard({
                         id: doc.id,
                         name: userData.name || userData.email.split('@')[0],
                         avatar: userData.avatar || '',
-                        location: userData.location || 'DV (William G. Davis Building)',
-                        time: userData.time || 'Now'
-                    });
+                        location: userData.location || 'UTM Campus',
+                        time: userData.time || 'Now',
+                        interests: userData.tags && userData.tags.length > 0
+                            ? userData.tags.map(t => typeof t === 'object' ? t.text : t)
+                            : ['UTM Student']
+                    }, status, friendStatuses);
                     userListEl.appendChild(card);
                 }
             });
 
-            // Add Dummy Profiles
-            const dummyUsers = [
-                {
-                    id: 'dummy1',
-                    name: 'Yousef Sadiq',
-                    location: 'Maanjiwe Nendamowinan',
-                    time: '5m ago',
-                    interests: ['Video Games', 'Computer Science', 'Library', 'Strength Training', 'UX Design', 'DV', 'Movies']
-                },
-                {
-                    id: 'dummy2',
-                    name: 'Sam Chen',
-                    location: 'Hazel McCallion Academic Learning Centre',
-                    time: '12m ago',
-                    interests: ['Art', 'Design', 'Music', 'Hiking']
-                },
-                {
-                    id: 'dummy3',
-                    name: 'Jordan Smith',
-                    location: 'Deerfield Hall',
-                    time: 'Now',
-                    interests: ['Coding', 'Coffee', 'Startups']
-                }
-            ];
-
-            dummyUsers.forEach(user => {
-                const card = createUserCard(user);
-                userListEl.appendChild(card);
-            });
+            // Dummy profiles (only shown if no real users besides self)
+            if (userListEl.children.length === 0) {
+                const dummyUsers = [
+                    { id: 'dummy1', name: 'Yousef Sadiq', location: 'Maanjiwe Nendamowinan', time: '5m ago', interests: ['Video Games', 'Computer Science', 'Library', 'Strength Training', 'UX Design', 'DV', 'Movies'] },
+                    { id: 'dummy2', name: 'Sam Chen', location: 'Hazel McCallion Academic Learning Centre', time: '12m ago', interests: ['Art', 'Design', 'Music', 'Hiking'] },
+                    { id: 'dummy3', name: 'Jordan Smith', location: 'Deerfield Hall', time: 'Now', interests: ['Coding', 'Coffee', 'Startups'] }
+                ];
+                dummyUsers.forEach(user => userListEl.appendChild(createUserCard(user, null, {})));
+            }
         } catch (error) {
             console.error("Error fetching users:", error);
+            userListEl.innerHTML = '<div class="loading-users">Could not load users.</div>';
         }
     }
 
-    function createUserCard(user) {
+    async function renderMyFriends() {
+        const listEl = document.getElementById('myFriendsList');
+        if (!listEl) return;
+        listEl.innerHTML = '<div class="loading-users">Loading your friends...</div>';
+
+        try {
+            const myUid = auth.currentUser.uid;
+            const snap = await db.collection('users').doc(myUid).collection('friends')
+                .where('status', '==', 'accepted').get();
+
+            listEl.innerHTML = '';
+
+            if (snap.empty) {
+                listEl.innerHTML = '<div class="loading-users" style="color:var(--text-secondary)">No friends yet — discover people nearby!</div>';
+                return;
+            }
+
+            for (const friendDoc of snap.docs) {
+                const friendUid = friendDoc.id;
+                const uDoc = await db.collection('users').doc(friendUid).get();
+                if (!uDoc.exists) continue;
+                const ud = uDoc.data();
+                const card = createUserCard({
+                    id: friendUid,
+                    name: ud.name || ud.email.split('@')[0],
+                    avatar: ud.avatar || '',
+                    location: ud.location || 'UTM Campus',
+                    time: 'Friend',
+                    interests: ud.tags && ud.tags.length > 0
+                        ? ud.tags.map(t => typeof t === 'object' ? t.text : t)
+                        : ['UTM Student']
+                }, 'accepted', {});
+                listEl.appendChild(card);
+            }
+        } catch (e) {
+            console.error("Error loading friends:", e);
+            listEl.innerHTML = '<div class="loading-users">Could not load friends.</div>';
+        }
+    }
+
+    async function renderIncomingRequests() {
+        const banner = document.getElementById('incomingRequestsBanner');
+        const list = document.getElementById('incomingRequestsList');
+        if (!banner || !list) return;
+
+        try {
+            const myUid = auth.currentUser.uid;
+            const snap = await db.collection('users').doc(myUid).collection('friends')
+                .where('status', '==', 'pending')
+                .where('initiator', '!=', myUid)
+                .get();
+
+            if (snap.empty) {
+                banner.style.display = 'none';
+                return;
+            }
+
+            banner.style.display = '';
+            list.innerHTML = '';
+
+            for (const reqDoc of snap.docs) {
+                const fromUid = reqDoc.id;
+                const uDoc = await db.collection('users').doc(fromUid).get();
+                const name = uDoc.exists ? (uDoc.data().name || fromUid) : fromUid;
+
+                const item = document.createElement('div');
+                item.className = 'request-item';
+                item.innerHTML = `
+                    <span class="request-name">${name} wants to connect</span>
+                    <div class="request-actions">
+                        <button class="btn-accept" data-uid="${fromUid}">Accept</button>
+                        <button class="btn-decline" data-uid="${fromUid}">Decline</button>
+                    </div>
+                `;
+                item.querySelector('.btn-accept').addEventListener('click', async () => {
+                    await acceptFriendRequest(fromUid);
+                    await renderIncomingRequests();
+                    await renderMyFriends();
+                    await renderDiscover();
+                });
+                item.querySelector('.btn-decline').addEventListener('click', async () => {
+                    await removeFriend(fromUid);
+                    await renderIncomingRequests();
+                    await renderDiscover();
+                });
+                list.appendChild(item);
+            }
+        } catch (e) {
+            console.error("Error loading incoming requests:", e);
+        }
+    }
+
+    function createUserCard(user, friendStatus, allStatuses) {
         const card = document.createElement('div');
         card.className = 'friend-card-v2';
         card.onclick = () => window.location.href = `profile.html?uid=${user.id}`;
@@ -351,12 +478,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         header.appendChild(avatar);
         header.appendChild(info);
 
+        // Actions area
         const actions = document.createElement('div');
         actions.className = 'card-actions-v2';
-        actions.innerHTML = `
-            <button class="btn-card-add" onclick="event.stopPropagation();">Add +</button>
-            <div class="btn-card-remove" onclick="event.stopPropagation();">−</div>
-        `;
+
+        // Build the right button based on status
+        if (friendStatus === 'accepted') {
+            actions.innerHTML = `<button class="btn-card-friends" onclick="event.stopPropagation();">✓ Friends</button>
+                <div class="btn-card-remove" title="Remove friend" onclick="event.stopPropagation();">−</div>`;
+            actions.querySelector('.btn-card-remove').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (confirm(`Remove ${user.name} as a friend?`)) {
+                    await removeFriend(user.id);
+                    await renderMyFriends();
+                    await renderDiscover();
+                }
+            });
+        } else if (friendStatus === 'pending_outgoing') {
+            actions.innerHTML = `<button class="btn-card-pending" onclick="event.stopPropagation();" disabled>Pending ✓</button>`;
+        } else if (friendStatus === 'pending_incoming') {
+            actions.innerHTML = `<button class="btn-card-accept" onclick="event.stopPropagation();">Accept</button>`;
+            actions.querySelector('.btn-card-accept').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await acceptFriendRequest(user.id);
+                await renderIncomingRequests();
+                await renderMyFriends();
+                await renderDiscover();
+            });
+        } else {
+            // Not friends — show Add button
+            const addBtn = document.createElement('button');
+            addBtn.className = 'btn-card-add';
+            addBtn.textContent = 'Add +';
+            addBtn.onclick = async (e) => {
+                e.stopPropagation();
+                addBtn.disabled = true;
+                addBtn.textContent = 'Sending...';
+                try {
+                    await sendFriendRequest(user.id);
+                    addBtn.textContent = 'Pending ✓';
+                    addBtn.className = 'btn-card-pending';
+                } catch (err) {
+                    console.error(err);
+                    addBtn.disabled = false;
+                    addBtn.textContent = 'Add +';
+                }
+            };
+            actions.appendChild(addBtn);
+        }
 
         const tagsContainer = document.createElement('div');
         tagsContainer.className = 'tags-container-v2';
@@ -366,8 +535,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         interests.forEach((interest, index) => {
             const tag = document.createElement('span');
-            const colorClass = `tag-${tagColors[index % tagColors.length]}`;
-            tag.className = `tag-v2 ${colorClass}`;
+            tag.className = `tag-v2 tag-${tagColors[index % tagColors.length]}`;
             tag.textContent = interest;
             tagsContainer.appendChild(tag);
         });
@@ -379,6 +547,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return card;
     }
 
+    // ─── PROFILE PAGE ───────────────────────────────────────────────────────────
+
     async function initProfile() {
         const urlParams = new URLSearchParams(window.location.search);
         const uid = urlParams.get('uid') || (auth.currentUser ? auth.currentUser.uid : null);
@@ -388,62 +558,99 @@ document.addEventListener('DOMContentLoaded', async () => {
         const backNav = document.getElementById('backToFriends');
         if (backNav) backNav.onclick = () => window.history.back();
 
+        // Show/hide edit button: only for own profile
+        const editBtn = document.getElementById('editProfileBtn');
+        if (editBtn) {
+            if (auth.currentUser && uid === auth.currentUser.uid) {
+                editBtn.style.display = '';
+            } else {
+                editBtn.style.display = 'none';
+            }
+        }
+
         try {
             const doc = await db.collection('users').doc(uid).get();
-            const userData = doc.exists ? doc.data() : { name: "Yousef Sadiq", bio: "Co-Founder of Findr, avid procrastinator." };
 
-            document.getElementById('userNameDisplay').textContent = userData.name || "Yousef Sadiq";
-
-            // Force new demo picture if we are on the demo profile or testing
-            if (!userData.avatar || userData.name === "Yousef Sadiq") {
-                document.getElementById('userAvatar').src = "youssef-mog.jpg";
+            let userData;
+            if (doc.exists && doc.data().name) {
+                userData = doc.data();
             } else {
-                document.getElementById('userAvatar').src = userData.avatar;
+                // Uid not in DB — show a graceful fallback (e.g. dummy profile)
+                userData = {
+                    name: 'Unknown User',
+                    bio: '',
+                    avatar: '',
+                    tags: []
+                };
             }
 
-            document.getElementById('userBioDisplay').textContent = userData.bio || "Co-Founder of Findr, avid procrastinator.";
+            document.getElementById('userNameDisplay').textContent = userData.name || 'User';
 
-            // Render categorized tags
-            renderCategorizedTags(userData.tags && userData.tags.length > 0 ? userData.tags : [
-                "Basketball", "Finance", "Video Games", "Strength Training", "Movies", "Food",
-                "Graphic Design", "Math", "Computer Science", "UX Design", "Game Design",
-                "Library", "DV", "DH"
-            ]);
+            const avatarEl = document.getElementById('userAvatar');
+            if (avatarEl) {
+                avatarEl.src = userData.avatar || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ij48L2NpcmNsZT48cGF0aCBkPSJNMjAgMjF2LTIgYTQgNCAwIDAgMC00LTRoLTggYTQgNCAwIDAgMC00IDR2MiI+PC9wYXRoPjwvc3ZnPg==';
+            }
+
+            document.getElementById('userBioDisplay').textContent = userData.bio || 'No bio yet.';
+
+            const tags = userData.tags && userData.tags.length > 0 ? userData.tags : [];
+            renderCategorizedTags(tags);
+
         } catch (error) {
             console.error("Error loading profile:", error);
         }
 
-        // Connectivity for future uploader
         setupUploader();
     }
 
+    // ─── EDIT PROFILE ───────────────────────────────────────────────────────────
+
+    // All available tags for the selector
+    const ALL_TAGS = {
+        interests: [
+            'Basketball', 'Soccer', 'Tennis', 'Running', 'Hiking',
+            'Video Games', 'Movies', 'Music', 'Reading', 'Photography',
+            'Finance', 'Food', 'Strength Training', 'Yoga', 'Cooking',
+            'Automobiles', 'Fashion', 'Travel', 'Gaming', 'Anime'
+        ],
+        skills: [
+            'Computer Science', 'Math', 'Statistics', 'Physics', 'Biology',
+            'Chemistry', 'UX Design', 'Graphic Design', 'Game Design',
+            'Web Development', 'Data Science', 'Machine Learning',
+            'Economics', 'Psychology', 'Business', 'Marketing', 'Finance',
+            'Architecture', 'Art', 'Writing'
+        ],
+        hangout: [
+            'Library', 'DV', 'DH', 'Maanjiwe Nendamowinan', 'Hazel McCallion',
+            'RAWC', 'Cafeteria', 'Innovation Complex', 'Student Centre',
+            'CCT Building', 'Online / Discord', 'Off-Campus', 'Tim Hortons'
+        ]
+    };
+
     async function initEditProfile() {
         const backBtn = document.getElementById("backToProfile");
-        if (backBtn) {
-            backBtn.onclick = () => window.location.href = "profile.html";
-        }
+        if (backBtn) backBtn.onclick = () => window.location.href = "profile.html";
 
         if (!auth.currentUser) return;
 
-        // Load existing data
+        let currentTags = [];
+
         try {
             const doc = await db.collection("users").doc(auth.currentUser.uid).get();
             if (doc.exists) {
                 const data = doc.data();
-
-                const nameEl = document.getElementById("editName");
-                const bioEl = document.getElementById("editBio");
-                const programEl = document.getElementById("editProgram");
-                const avatarEl = document.getElementById("editAvatar");
-
-                if (nameEl) nameEl.value = data.name || "";
-                if (bioEl) bioEl.value = data.bio || "";
-                if (programEl) programEl.value = data.program || "None";
-                if (avatarEl && data.avatar) avatarEl.src = data.avatar;
+                if (document.getElementById("editName")) document.getElementById("editName").value = data.name || "";
+                if (document.getElementById("editBio")) document.getElementById("editBio").value = data.bio || "";
+                if (document.getElementById("editProgram")) document.getElementById("editProgram").value = data.program || "None";
+                if (document.getElementById("editAvatar") && data.avatar) document.getElementById("editAvatar").src = data.avatar;
+                currentTags = (data.tags || []).map(t => typeof t === 'object' ? t.text : t);
             }
         } catch (e) {
             console.error("Failed to load profile for editing:", e);
         }
+
+        // Render tag selector
+        renderTagSelector(currentTags);
 
         // Save handler
         const saveBtn = document.getElementById("saveProfileBtn");
@@ -453,26 +660,63 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const bio = document.getElementById("editBio")?.value ?? "";
                 const program = document.getElementById("editProgram")?.value ?? "None";
 
+                // Collect selected tags
+                const selectedTags = Array.from(document.querySelectorAll('.tag-chip.selected'))
+                    .map(el => el.dataset.tag);
+
                 try {
                     await db.collection("users").doc(auth.currentUser.uid).update({
                         name,
                         bio,
-                        program
+                        program,
+                        tags: selectedTags
                     });
 
                     const toast = document.getElementById("saveToast");
                     if (toast) {
                         toast.style.display = "block";
                         toast.textContent = "Changes saved ✓";
-                        setTimeout(() => {
-                            toast.style.display = "none";
-                        }, 2500);
+                        setTimeout(() => toast.style.display = "none", 2500);
                     }
                 } catch (e) {
                     console.error("Failed to save profile changes:", e);
                 }
             };
         }
+    }
+
+    function renderTagSelector(selectedTags) {
+        const container = document.getElementById('tagSelectorContainer');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        const sections = [
+            { label: 'Interests', key: 'interests' },
+            { label: 'Education / Skills', key: 'skills' },
+            { label: 'Hangout Spots', key: 'hangout' }
+        ];
+
+        sections.forEach(({ label, key }) => {
+            const heading = document.createElement('p');
+            heading.className = 'tag-section-label';
+            heading.textContent = label;
+            container.appendChild(heading);
+
+            const row = document.createElement('div');
+            row.className = 'tag-chip-row';
+
+            ALL_TAGS[key].forEach(tag => {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip' + (selectedTags.includes(tag) ? ' selected' : '');
+                chip.dataset.tag = tag;
+                chip.textContent = tag;
+                chip.addEventListener('click', () => chip.classList.toggle('selected'));
+                row.appendChild(chip);
+            });
+
+            container.appendChild(row);
+        });
     }
 
     function renderCategorizedTags(tags) {
@@ -483,53 +727,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!interestsContainer) return;
 
         interestsContainer.innerHTML = '';
-        skillsContainer.innerHTML = '';
-        hangoutContainer.innerHTML = '';
+        if (skillsContainer) skillsContainer.innerHTML = '';
+        if (hangoutContainer) hangoutContainer.innerHTML = '';
 
         tags.forEach(tag => {
             const pill = document.createElement('span');
             pill.className = 'pill';
-            pill.textContent = tag.text || tag;
+            const text = typeof tag === 'object' ? tag.text : tag;
+            pill.textContent = text;
+            const lower = text.toLowerCase();
 
-            // Simple heuristic for demo
-            const lowText = pill.textContent.toLowerCase();
-            if (tag.color === 'orange' || ['gaming', 'video games', 'basketball', 'automobiles', 'movies', 'finance', 'strength training'].some(k => lowText.includes(k))) {
+            if (ALL_TAGS.hangout.map(t => t.toLowerCase()).includes(lower)) {
+                pill.classList.add('purple');
+                if (hangoutContainer) hangoutContainer.appendChild(pill);
+            } else if (ALL_TAGS.skills.map(t => t.toLowerCase()).includes(lower)) {
+                pill.classList.add('blue');
+                if (skillsContainer) skillsContainer.appendChild(pill);
+            } else {
                 pill.classList.add('orange');
                 interestsContainer.appendChild(pill);
-            } else if (tag.color === 'blue' || ['math', 'computer science', 'statistics', 'ux design', 'design', 'graphic design'].some(k => lowText.includes(k))) {
-                pill.classList.add('blue');
-                skillsContainer.appendChild(pill);
-            } else {
-                pill.classList.add('purple');
-                hangoutContainer.appendChild(pill);
             }
         });
+
+        // Show placeholder if empty
+        if (interestsContainer.children.length === 0) interestsContainer.innerHTML = '<span style="color:var(--text-secondary);font-size:14px">None set</span>';
+        if (skillsContainer && skillsContainer.children.length === 0) skillsContainer.innerHTML = '<span style="color:var(--text-secondary);font-size:14px">None set</span>';
+        if (hangoutContainer && hangoutContainer.children.length === 0) hangoutContainer.innerHTML = '<span style="color:var(--text-secondary);font-size:14px">None set</span>';
     }
 
     function setupUploader() {
         const overlay = document.querySelector('.avatar-edit-overlay');
         const placeholder = document.querySelector('.uploader-placeholder');
-
         const message = () => alert('The uploader is almost ready! We are finishing the Firebase Storage connection.');
-
         if (overlay) overlay.addEventListener('click', message);
         if (placeholder) placeholder.addEventListener('click', message);
     }
 
-    // Future-proof uploader function
     async function uploadProfileImage(file) {
         if (!auth.currentUser) return;
-
         const storageRef = storage.ref(`avatars/${auth.currentUser.uid}`);
         try {
             const snapshot = await storageRef.put(file);
             const downloadURL = await snapshot.ref.getDownloadURL();
-
-            // Update user document in Firestore
-            await db.collection('users').doc(auth.currentUser.uid).update({
-                avatar: downloadURL
-            });
-
+            await db.collection('users').doc(auth.currentUser.uid).update({ avatar: downloadURL });
             return downloadURL;
         } catch (error) {
             console.error("Upload failed:", error);
@@ -537,19 +777,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Geolocation Logic
     function initLocation(mockLocation) {
-        const locationNameEl = document.getElementById('locationName');
-        const locationNameShortEl = document.getElementById('locationNameShort');
-
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    updateLocationUI(mockLocation.name, mockLocation.shortName);
-                },
-                (error) => {
-                    updateLocationUI(mockLocation.name, mockLocation.shortName);
-                }
+                () => updateLocationUI(mockLocation.name, mockLocation.shortName),
+                () => updateLocationUI(mockLocation.name, mockLocation.shortName)
             );
         } else {
             updateLocationUI(mockLocation.name, mockLocation.shortName);
@@ -557,11 +789,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateLocationUI(fullName, shortName) {
-        if (document.getElementById('locationName')) {
-            document.getElementById('locationName').textContent = fullName;
-        }
-        if (document.getElementById('locationNameShort')) {
-            document.getElementById('locationNameShort').textContent = shortName;
-        }
+        if (document.getElementById('locationName')) document.getElementById('locationName').textContent = fullName;
+        if (document.getElementById('locationNameShort')) document.getElementById('locationNameShort').textContent = shortName;
     }
 });

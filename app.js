@@ -1,26 +1,29 @@
-import { fb } from '../services/FirebaseService.js';
-import { AppRouter } from '../controllers/Router.js';
-import { DashboardController } from '../controllers/DashboardController.js';
-import { FriendsController } from '../controllers/FriendsController.js';
-import { ProfileController } from '../controllers/ProfileController.js';
-import { EditProfileController } from '../controllers/EditProfileController.js';
+import { fb } from './services/FirebaseService.js';
+import { AppRouter } from './controllers/Router.js';
+import { DashboardController } from './controllers/DashboardController.js';
+import { FriendsController } from './controllers/FriendsController.js';
+import { ProfileController } from './controllers/ProfileController.js';
+import { EditProfileController } from './controllers/EditProfileController.js';
+import { AuthController } from './controllers/AuthController.js'; // <-- Imported!
 import { signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const app = {
     init() {
-        // Initialize controllers and pass the app instance to those that need routing access
+        // Initialize controllers
         this.router = new AppRouter(this);
         this.dashboardController = new DashboardController();
         this.friendsController = new FriendsController();
         this.profileController = new ProfileController(this);
         this.editController = new EditProfileController(this);
         
-        // Expose app to global window just in case your HTML relies on inline handlers (like the addTag buttons)
+        // Connect the Auth Controller!
+        this.authController = new AuthController(this); 
+        
         window.app = this; 
 
         this.setupGlobalListeners();
 
-        // Initialize Firebase Auth - this determines which view to load first
+        // Initialize Firebase Auth
         fb.initAuth((user) => {
             if (user) {
                 this.dashboardController.start();
@@ -32,23 +35,8 @@ const app = {
     },
 
     setupGlobalListeners() {
-        // Login Button
-        const loginBtn = document.getElementById('btn-demo-login');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', async () => {
-                const name = document.getElementById('authName').value || "New Student";
-                loginBtn.textContent = "Loading...";
-                
-                if (fb.userModel) fb.userModel.name = name;
-                
-                if (fb.currentUser) {
-                    await fb.saveMyProfile();
-                    this.dashboardController.start();
-                    this.router.navigate('dashboard');
-                }
-            });
-        }
-
+        // The old login listener was removed from here because AuthController handles it now.
+        
         // Logout Button
         const logoutBtn = document.getElementById('btn-logout');
         if (logoutBtn) {
@@ -62,5 +50,4 @@ const app = {
     }
 };
 
-// Start the application once the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => app.init());

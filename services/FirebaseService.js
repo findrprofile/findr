@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 import { User } from '../models/User.js';
 
 class FirebaseService {
@@ -20,6 +21,7 @@ class FirebaseService {
         this.db = getFirestore(this.app);
         this.currentUser = null;
         this.userModel = new User(); 
+        this.storage = getStorage(this.app);
     }
 
     // ─── AUTHENTICATION METHODS ──────────────────────────────────────────
@@ -74,6 +76,19 @@ class FirebaseService {
         if (!this.currentUser) return;
         const docRef = doc(this.getUsersCollection(), this.currentUser.uid);
         await updateDoc(docRef, this.userModel.toFirestore());
+    }
+
+    // ─── STORAGE METHODS ────────────────────────────────────────────────
+    
+    async uploadAvatar(file, uid) {
+        // Create a reference to 'avatars/USER_ID_TIMESTAMP'
+        const storageRef = ref(this.storage, `avatars/${uid}_${Date.now()}`);
+        
+        // Upload the file
+        await uploadBytes(storageRef, file);
+        
+        // Return the public URL so we can save it to Firestore
+        return await getDownloadURL(storageRef);
     }
 
     listenToAllUsers(callback) {

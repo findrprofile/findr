@@ -1,26 +1,42 @@
 :root {
     --bg-light: #ffffff;
-    --bg-dark: #005662;
-    --primary-teal: #00e5ff;
+    --bg-dark: #006E7B;
+    --primary-teal: #00FFD0;
     --text-dark: #111111;
     --text-light: #ffffff;
     --text-secondary: #666666;
-    --badge-orange: #f59e0b;
-    --badge-blue: #0ea5e9;
-    --badge-purple: #8b5cf6;
+    --badge-orange: #F29500;
+    --badge-blue: #00A1F2;
+    --badge-purple: #5800A9;
     --nav-height: 70px;
     --header-height: 60px;
-
-    /* THE UX ICON SYSTEM */
-    /* To update an icon, just paste your SVG data URI here, or use url('../path-to-svg.svg') */
-    --svg-dashboard: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>');
-    --svg-friends: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>');
-    --svg-profile: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>');
-    --svg-settings: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>');
-    --svg-bell: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>');
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+/* THE UX ICON SYSTEM (PNG VERSION) */
+.icon {
+    width: 24px;
+    height: 24px;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-color: transparent !important; 
+    -webkit-mask-image: none !important; /* Forces the old mask to die */
+    mask-image: none !important;
+}
+
+/* 1. Your Inactive Icons (e.g., your grey PNGs) */
+.icon-dashboard { background-image: url('/artwork/Dashboard_Icon_grey.png'); }
+.icon-friends { background-image: url('/artwork/Friends_Icon_grey.png'); }
+.icon-profile { background-image: url('/artwork/Profile_Icon_grey.png'); }
+.icon-settings { background-image: url('/artwork/Settings_Icon_grey.png'); }
+
+/* 2. Your Active Icons (e.g., your teal PNGs) */
+.nav-item.active .icon-dashboard { background-image: url('/artwork/Dashboard_Icon.png'); }
+.nav-item.active .icon-friends { background-image: url('/artwork/Friends_Icon.png'); }
+.nav-item.active .icon-profile { background-image: url('/artwork/Profile_Icon.png'); }
+.nav-item.active .icon-settings { background-image: url('/artwork/Settings_Icon.png'); }
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }
 
 /* Views */
@@ -36,24 +52,6 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
 .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: var(--nav-height); background: var(--bg-dark); display: flex; justify-content: space-around; align-items: center; border-top-left-radius: 20px; border-top-right-radius: 20px; z-index: 100; }
 .nav-item { color: #80acb3; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 500; gap: 4px; cursor: pointer; }
 .nav-item.active { color: var(--primary-teal); }
-
-/* The Magic Icon CSS Masking */
-.icon {
-    width: 24px;
-    height: 24px;
-    background-color: currentColor;
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-}
-.icon-dashboard { -webkit-mask-image: var(--svg-dashboard); mask-image: var(--svg-dashboard); }
-.icon-friends { -webkit-mask-image: var(--svg-friends); mask-image: var(--svg-friends); }
-.icon-profile { -webkit-mask-image: var(--svg-profile); mask-image: var(--svg-profile); }
-.icon-settings { -webkit-mask-image: var(--svg-settings); mask-image: var(--svg-settings); }
-.icon-bell { width: 20px; height: 20px; -webkit-mask-image: var(--svg-bell); mask-image: var(--svg-bell); }
 
 /* Globals */
 .container { padding: 0 20px; }
@@ -119,6 +117,21 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
 .editable-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; margin: 4px; color: white; }
 .editable-chip button { background: rgba(0,0,0,0.2); border: none; color: white; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 10px;}
 .edit-tags-wrapper { margin-bottom: 15px; }
+
+.app-logo {
+    height: 60px; /* Adjust this to make your logo bigger or smaller */
+    width: auto;
+    object-fit: contain;
+    margin-top: 10px;
+}
+
+/* For the giant logo on the login screen */
+.app-logo-large {
+    height: 110px; 
+    width: auto;
+    object-fit: contain;
+    margin-bottom: 2px;
+}
 
 /* Settings */
 .settings-panel { background: #f9f9f9; padding: 20px; border-radius: 15px; }

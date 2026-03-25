@@ -39,6 +39,24 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }
 
+/* Notification Bell */
+.badge-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
 /* Views */
 .view { display: none; padding-bottom: calc(var(--nav-height) + 20px); }
 .view.active { display: block; animation: fadeIn 0.3s ease; }

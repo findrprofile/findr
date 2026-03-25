@@ -3,7 +3,16 @@ export class User {
         this.uid = data.uid || '';
         this.name = data.name || 'Anonymous Student';
         this.bio = data.bio || 'Studying at UTM.';
-        this.avatar = data.avatar || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM2QzZDNkIiBzdHJva2Utd2lkdGg9IjIiPjxjaXJjbGUgY3g9IjEyIiBjeT0iOCIgcj0iNCI+PC9jaXJjbGU+PHBhdGggZD0iTTIwIDIxdi0yYTQgNCAwIDAgMC00LTRoLThhNCA0IDAgMCAwLTQgNHYyIj48L3BhdGg+PC9zdmc+';
+        
+        // --- THE FIX ---
+        let loadedAvatar = data.avatar;
+        // If the database tries to hand us the old SVG, ignore it!
+        if (loadedAvatar && loadedAvatar.includes('data:image/svg+xml')) {
+            loadedAvatar = null; 
+        }
+        // Fallback to your beautiful new default icon
+        this.avatar = loadedAvatar || 'artwork/Default_Profile_Icon.png';
+        // --------------
         
         this.tags = {
             interests: Array.isArray(data.tags?.interests) ? data.tags.interests : [],
@@ -13,6 +22,8 @@ export class User {
         
         this.lastLocation = data.lastLocation || 'Maanjiwe Nendamowinan';
         this.friendsList = Array.isArray(data.friendsList) ? data.friendsList : [];
+        this.incomingRequests = Array.isArray(data.incomingRequests) ? data.incomingRequests : [];
+        this.outgoingRequests = Array.isArray(data.outgoingRequests) ? data.outgoingRequests : [];
     }
 
     addTag(category, tagText) {
@@ -42,7 +53,9 @@ export class User {
             avatar: this.avatar,
             tags: this.tags,
             lastLocation: this.lastLocation,
-            friendsList: this.friendsList
+            friendsList: this.friendsList,
+            incomingRequests: this.incomingRequests, // Add this
+            outgoingRequests: this.outgoingRequests  // Add this
         };
     }
 }

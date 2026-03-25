@@ -56,7 +56,7 @@ export class DashboardController {
 
             // Attach event listener safely without inline onclick
             if (!isFriend) {
-                card.querySelector('.btn-add').addEventListener('click', () => this.addFriend(u.uid));
+                card.querySelector('.btn-add').addEventListener('click', (e) => this.addFriend(u.uid, e.target));
             }
             card.querySelector('.btn-remove').addEventListener('click', () => alert('Hide user feature coming soon.'));
 
@@ -64,11 +64,12 @@ export class DashboardController {
         });
     }
 
-    async addFriend(friendUid) {
-        if (!fb.userModel.friendsList.includes(friendUid)) {
-            fb.userModel.friendsList.push(friendUid);
-            await fb.saveMyProfile();
-            // No need to manually re-render; the real-time listener handles it!
-        }
+    async addFriend(friendUid, btnElement) {
+        btnElement.disabled = true;
+        btnElement.textContent = 'Sending...';
+        await fb.sendFriendRequest(friendUid);
+        btnElement.textContent = 'Sent ✓';
+        btnElement.style.background = '#e0f7fa';
+        btnElement.style.color = 'var(--bg-dark)';
     }
 }

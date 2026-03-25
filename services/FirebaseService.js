@@ -103,6 +103,67 @@ class FirebaseService {
             callback(allUsers);
         }, (error) => console.error("Snapshot error:", error));
     }
+
+    // ─── FRIEND REQUEST SYSTEM ──────────────────────────────────────────
+
+    listenToMyProfile(callback) {
+        if (!this.currentUser) return;
+        const docRef = doc(this.getUsersCollection(), this.currentUser.uid);
+        // Real-time listener on your OWN profile to catch incoming requests instantly
+        return onSnapshot(docRef, (snap) => {
+            if (snap.exists()) {
+                this.userModel = new User({ uid: snap.id, ...snap.data() });
+                callback(this.userModel);
+            }
+        });
+    }
+
+    async sendFriendRequest(targetUid) {
+        if (!this.userModel.outgoingRequests.includes(targetUid)) {
+            this.userModel.outgoingRequests.push(targetUid);
+            await this.saveMyProfile();
+        }
+
+        const targetRef = doc(this.getUsersCollection(), targetUid);
+        const targetSnap = await getDoc(targetRef);
+        if (targetSnap.exists()) {
+            const targetData = targetSnap.data();
+            const incoming = targetData.incomingRequests || [];
+            if (!incoming.includes(this.currentUser.uid)) {
+                incoming.push(this.currentUser.uid);
+                await updateDoc(targetRef, { incomingRequests: incoming });
+            }
+        }
+    }
+
+    async acceptFriendRequest(targetUid) {
+        this.userModel.incomingRequests = this.userModel.incomingRequests.filter(id => id !== targetUid);
+        if (!this.userModel.friendsList.includes(targetUid)) this.userModel.friendsList.push(targetUid);
+        await this.saveMyProfile();
+
+        const targetRef = doc(this.getUsersCollection(), targetUid);
+        const targetSnap = await getDoc(targetRef);
+        if (targetSnap.exists()) {
+            const targetData = targetSnap.data();
+            const outgoing = (targetData.outgoingRequests || []).filter(id => id !== this.currentUser.uid);
+            const friends = targetData.friendsList || [];
+            if (!friends.includes(this.currentUser.uid)) friends.push(this.currentUser.uid);
+            await updateDoc(targetRef, { outgoingRequests: outgoing, friendsList: friends });
+        }
+    }
+
+    async declineFriendRequest(targetUid) {
+        this.userModel.incomingRequests = this.userModel.incomingRequests.filter(id => id !== targetUid);
+        await this.saveMyProfile();
+
+        const targetRef = doc(this.getUsersCollection(), targetUid);
+        const targetSnap = await getDoc(targetRef);
+        if (targetSnap.exists()) {
+            const targetData = targetSnap.data();
+            const outgoing = (targetData.outgoingRequests || []).filter(id => id !== this.currentUser.uid);
+            await updateDoc(targetRef, { outgoingRequests: outgoing });
+        }
+    }
 }
 
 export const fb = new FirebaseService();

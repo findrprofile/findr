@@ -25,16 +25,16 @@
 }
 
 /* 1. Your Inactive Icons (e.g., your grey PNGs) */
-.icon-dashboard { background-image: url('/artwork/Dashboard_Icon_grey.png'); }
-.icon-friends { background-image: url('/artwork/Friends_Icon_grey.png'); }
-.icon-profile { background-image: url('/artwork/Profile_Icon_grey.png'); }
-.icon-settings { background-image: url('/artwork/Settings_Icon_grey.png'); }
+.icon-dashboard { background-image: url('../artwork/Dashboard_Icon_grey.png'); }
+.icon-friends { background-image: url('../artwork/Friends_Icon_grey.png'); }
+.icon-profile { background-image: url('../artwork/Profile_Icon_grey.png'); }
+.icon-settings { background-image: url('../artwork/Settings_Icon_grey.png'); }
 
 /* 2. Your Active Icons (e.g., your teal PNGs) */
-.nav-item.active .icon-dashboard { background-image: url('/artwork/Dashboard_Icon.png'); }
-.nav-item.active .icon-friends { background-image: url('/artwork/Friends_Icon.png'); }
-.nav-item.active .icon-profile { background-image: url('/artwork/Profile_Icon.png'); }
-.nav-item.active .icon-settings { background-image: url('/artwork/Settings_Icon.png'); }
+.nav-item.active .icon-dashboard { background-image: url('../artwork/Dashboard_Icon.png'); }
+.nav-item.active .icon-friends { background-image: url('../artwork/Friends_Icon.png'); }
+.nav-item.active .icon-profile { background-image: url('../artwork/Profile_Icon.png'); }
+.nav-item.active .icon-settings { background-image: url('../artwork/Settings_Icon.png'); }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; }

@@ -112,16 +112,43 @@
 
         <div id="view-dashboard" class="view">
           <div class="container">
-            <h1 class="page-title">
-              Welcome to<br /><span style="font-weight: 800">MN</span> (Maanjiwe
-              Nendamowinan)
+            <h1 class="page-title" id="dash-main-title">
+              Connecting to GPS...
             </h1>
-            <div class="hero-card">
-              <div class="hero-placeholder">MN Building</div>
+
+            <div
+              class="hero-card"
+              id="dash-hero-card"
+              style="
+                display: none;
+                padding: 0;
+                overflow: hidden;
+                border: 4px solid var(--primary-teal);
+              "
+            >
+              <img
+                id="dash-hero-img"
+                src=""
+                alt="Location Image"
+                style="
+                  width: 100%;
+                  height: 200px;
+                  object-fit: cover;
+                  display: block;
+                "
+              />
             </div>
-            <h2 class="section-subtitle">
-              Who's In <span style="font-weight: 800">MN</span> Right Now
+
+            <h2
+              class="section-subtitle"
+              id="dash-subtitle"
+              style="display: none"
+            >
+              Who's In
+              <span style="font-weight: 800" id="dash-building-code">MN</span>
+              Right Now
             </h2>
+
             <div id="dashboard-users-list"></div>
           </div>
         </div>

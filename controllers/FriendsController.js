@@ -18,28 +18,40 @@ export class FriendsController {
                     hasFriends = true;
                     const u = docSnap.data();
                     const card = document.createElement('div');
-                    card.style.cssText = "display:flex; align-items:center; gap:15px; background:white; padding:15px; border-radius:15px; margin-bottom:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05);";
+                    card.style.cssText = "display:flex; align-items:center; justify-content:space-between; gap:15px; background:white; padding:15px; border-radius:15px; margin-bottom:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05);";
                     
+                    // Added a wrapper div with "friend-profile-info" and cursor:pointer
                     card.innerHTML = `
-                        <div style="display:flex; align-items:center; gap:15px; flex: 1;">
-                            <img src="${u.avatar || 'artwork/Default_Profile_Icon.png'}" alt="${u.name}" style="width:50px; height:50px; border-radius:50%; background:#eee; object-fit:cover;">
+                        <div class="friend-profile-info" style="display:flex; align-items:center; gap:15px; flex: 1; cursor: pointer;" title="View Profile">
+                            <img src="${u.avatar || 'artwork/Default_Profile_Icon.png'}" alt="${u.name}" style="width:50px; height:50px; border-radius:50%; background:#eee; object-fit:cover; border: 2px solid var(--primary-teal);">
                             <div>
                                 <div style="font-weight:700;">${u.name}</div>
-                                <div style="font-size:12px; color:var(--text-secondary);">${u.lastLocation} • Now</div>
+                                <div style="font-size:12px; color:var(--text-secondary);">${u.lastLocation || 'Off Campus'} • Now</div>
                             </div>
                         </div>
                         <button class="btn-remove-friend" style="background:#fef2f2; color:#ef4444; border:none; padding:8px 12px; border-radius:12px; font-weight:700; font-size: 12px; cursor:pointer;">Remove</button>
                     `;
 
-                    // Wire up the remove button
-                    card.querySelector('.btn-remove-friend').addEventListener('click', async () => {
-                        if(confirm(`Are you sure you want to remove ${u.name}?`)) {
-                            card.style.opacity = '0.5';
-                            card.style.pointerEvents = 'none';
-                            await fb.removeFriend(docSnap.id);
-                            this.render(); // Redraw the friends list!
-                        }
-                    });
+                    // 1. NEW CLICK LISTENER: Opens the public profile!
+                    const profileClickZone = card.querySelector('.friend-profile-info');
+                    if (profileClickZone) {
+                        profileClickZone.addEventListener('click', () => {
+                            window.app.viewUserController.showProfile(docSnap.id);
+                        });
+                    }
+
+                    // 2. EXISTING CLICK LISTENER: Removes the friend
+                    const removeBtn = card.querySelector('.btn-remove-friend');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', async () => {
+                            if(confirm(`Are you sure you want to remove ${u.name}?`)) {
+                                card.style.opacity = '0.5';
+                                card.style.pointerEvents = 'none';
+                                await fb.removeFriend(docSnap.id);
+                                this.render(); // Redraw the friends list!
+                            }
+                        });
+                    }
 
                     container.appendChild(card);
                 }

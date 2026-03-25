@@ -91,6 +91,12 @@ class FirebaseService {
         return await getDownloadURL(storageRef);
     }
 
+    async getUserProfile(uid) {
+        const docRef = doc(this.getUsersCollection(), uid);
+        const snap = await getDoc(docRef);
+        return snap.exists() ? snap.data() : null;
+    }
+
     listenToAllUsers(callback) {
         if (!this.currentUser) return;
         return onSnapshot(this.getUsersCollection(), (snapshot) => {

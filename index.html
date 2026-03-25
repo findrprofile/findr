@@ -27,7 +27,7 @@
           <img
             src="artwork/Bell_Icon.png"
             alt="Notifications"
-            style="width: 24px; height: 24px; object-fit: contain"
+            style="width: 36px; height: 36px; object-fit: contain"
           />
           <span
             id="notification-badge"
@@ -197,6 +197,42 @@
             <div id="prof-tags-skills" class="badges-wrap"></div>
             <h4 class="badge-category-title purple-text">Hangout Spots</h4>
             <div id="prof-tags-hangouts" class="badges-wrap"></div>
+          </div>
+        </div>
+
+        <div id="view-user-profile" class="view">
+          <div class="container">
+            <div class="edit-header">
+              <button
+                class="btn-back"
+                onclick="app.router.navigate('dashboard')"
+              >
+                ←
+              </button>
+              <h1 class="page-title" style="margin-bottom: 0; margin-top: 5px">
+                Profile
+              </h1>
+            </div>
+
+            <div class="profile-header">
+              <img
+                src="artwork/Default_Profile_Icon.png"
+                id="public-prof-avatar"
+                class="profile-avatar-large"
+              />
+              <h2 id="public-prof-name">Loading...</h2>
+              <p id="public-prof-bio">...</p>
+            </div>
+
+            <h3 class="badges-title">Badges</h3>
+            <h4 class="badge-category-title orange-text">Interests</h4>
+            <div id="public-tags-interests" class="badges-wrap"></div>
+
+            <h4 class="badge-category-title blue-text">Education/Skills</h4>
+            <div id="public-tags-skills" class="badges-wrap"></div>
+
+            <h4 class="badge-category-title purple-text">Hangout Spots</h4>
+            <div id="public-tags-hangouts" class="badges-wrap"></div>
           </div>
         </div>
 

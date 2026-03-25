@@ -4,6 +4,7 @@ import { DashboardController } from './controllers/DashboardController.js';
 import { NotificationController } from './controllers/NotificationController.js';
 import { FriendsController } from './controllers/FriendsController.js';
 import { ProfileController } from './controllers/ProfileController.js';
+import { ViewUserController } from './controllers/ViewUserController.js';
 import { EditProfileController } from './controllers/EditProfileController.js';
 import { AuthController } from './controllers/AuthController.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -15,6 +16,7 @@ const app = {
         this.dashboardController = new DashboardController();
         this.friendsController = new FriendsController();
         this.profileController = new ProfileController(this);
+        this.viewUserController = new ViewUserController(this);
         this.editController = new EditProfileController(this);
         this.authController = new AuthController(this); 
         

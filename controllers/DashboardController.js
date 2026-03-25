@@ -267,7 +267,7 @@ export class DashboardController {
 
             card.innerHTML = `
                 <div class="uc-header">
-                    <div class="uc-profile-info">
+                    <div class="uc-profile-info" style="cursor: pointer;" title="View Profile">
                         <img src="${u.avatar || 'artwork/Default_Profile_Icon.png'}" class="uc-avatar" alt="${u.name}'s avatar">
                         <div><div class="uc-name">${u.name}</div></div>
                     </div>
@@ -278,6 +278,13 @@ export class DashboardController {
 
             const addBtn = card.querySelector('.btn-add');
             if (addBtn) addBtn.addEventListener('click', (e) => this.addFriend(u.uid, e.target));
+            // Make the entire left side of the card clickable!
+            const profileClickZone = card.querySelector('.uc-profile-info');
+            if (profileClickZone) {
+                profileClickZone.addEventListener('click', () => {
+                    window.app.viewUserController.showProfile(u.uid);
+                });
+            }
             this.listContainer.appendChild(card);
         });
     }

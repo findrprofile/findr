@@ -153,6 +153,7 @@ export class DashboardController {
                 // Save this new location to Firebase so others can see where you are!
                 if (fb.userModel && detectedBuilding) {
                     fb.userModel.lastLocation = detectedBuilding.code;
+                    fb.userModel.lastActive = Date.now(); // Stamps the exact millisecond!
                     await fb.saveMyProfile();
                 }
 

@@ -21,6 +21,7 @@ export class User {
         };
         
         this.lastLocation = data.lastLocation || 'Maanjiwe Nendamowinan';
+        this.lastActive = data.lastActive || Date.now();
         this.friendsList = Array.isArray(data.friendsList) ? data.friendsList : [];
         this.incomingRequests = Array.isArray(data.incomingRequests) ? data.incomingRequests : [];
         this.outgoingRequests = Array.isArray(data.outgoingRequests) ? data.outgoingRequests : [];
@@ -53,6 +54,7 @@ export class User {
             avatar: this.avatar,
             tags: this.tags,
             lastLocation: this.lastLocation,
+            lastActive: this.lastActive,
             friendsList: this.friendsList,
             incomingRequests: this.incomingRequests, // Add this
             outgoingRequests: this.outgoingRequests  // Add this

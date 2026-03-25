@@ -10,6 +10,8 @@ export class NotificationController {
         // Wire up the bell icon click
         document.getElementById('btn-notifications').addEventListener('click', () => {
             this.app.router.navigate('notifications');
+            // THE BUG FIX: Force the screen to draw the moment you open it!
+            this.render(); 
         });
     }
 
@@ -17,6 +19,7 @@ export class NotificationController {
         // Automatically updates the red badge the second someone adds you!
         fb.listenToMyProfile((userModel) => {
             this.updateBadge(userModel.incomingRequests.length);
+            // Also update the list live if they are currently looking at the page
             if (this.app.router.currentView === 'notifications') {
                 this.render();
             }
@@ -56,24 +59,22 @@ export class NotificationController {
             if (snap.exists()) {
                 const u = snap.data();
                 const card = document.createElement('div');
-                card.className = 'user-card';
-                card.style.display = 'flex';
-                card.style.flexDirection = 'row';
-                card.style.alignItems = 'center';
-                card.style.justifyContent = 'space-between';
-                card.style.marginBottom = '10px';
-
+                card.className = 'user-card'; // Using your exact Dashboard card CSS!
+                
+                // THE UI FIX: Formatted to match the dashboard perfectly
                 card.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <img src="${u.avatar || 'artwork/Default_Profile_Icon.png'}" style="width:45px; height:45px; border-radius:50%; border: 2px solid var(--primary-teal); object-fit:cover;">
-                        <div>
-                            <div style="font-weight:700; font-size:15px;">${u.name}</div>
-                            <div style="font-size:12px; color:#a5d6d9;">Sent you a friend request</div>
+                    <div class="uc-header" style="margin-bottom: 0;">
+                        <div class="uc-profile-info">
+                            <img src="${u.avatar || 'artwork/Default_Profile_Icon.png'}" class="uc-avatar" alt="${u.name}'s avatar">
+                            <div>
+                                <div class="uc-name">${u.name}</div>
+                                <div class="uc-location" style="color:var(--text-secondary); font-size: 12px;">Sent you a friend request</div>
+                            </div>
                         </div>
-                    </div>
-                    <div style="display:flex; flex-direction: column; gap:6px;">
-                        <button class="btn-card-accept" style="background:var(--primary-teal); color:var(--bg-dark); border:none; padding:6px 15px; border-radius:12px; font-weight:700; font-size: 12px; cursor:pointer;">Accept</button>
-                        <button class="btn-card-decline" style="background:#ef4444; color:white; border:none; padding:6px 15px; border-radius:12px; font-weight:700; font-size: 12px; cursor:pointer;">Decline</button>
+                        <div class="uc-actions" style="display: flex; gap: 8px;">
+                            <button class="btn-card-accept" style="background:var(--primary-teal); color:var(--bg-dark); border:none; padding:8px 16px; border-radius:20px; font-weight:700; font-size: 13px; cursor:pointer;">Accept</button>
+                            <button class="btn-card-decline" style="background:transparent; color:#ef4444; border:2px solid #ef4444; padding:6px 14px; border-radius:20px; font-weight:700; font-size: 13px; cursor:pointer;">Decline</button>
+                        </div>
                     </div>
                 `;
 

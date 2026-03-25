@@ -7,7 +7,6 @@ export class DashboardController {
     }
 
     start() {
-        // Starts the real-time listener from the Firebase service
         this.unsubscribe = fb.listenToAllUsers((users) => {
             this.render(users);
         });
@@ -24,7 +23,6 @@ export class DashboardController {
             const card = document.createElement('div');
             card.className = 'user-card';
             
-            // Generate the HTML for the badges
             let badgesHTML = '';
             const renderBadges = (arr, colorClass) => {
                 arr.forEach(tag => badgesHTML += `<span class="badge ${colorClass}">${tag}</span>`);
@@ -33,20 +31,31 @@ export class DashboardController {
             renderBadges(u.tags.skills, 'blue');
             renderBadges(u.tags.hangouts, 'purple');
 
+            // --- THE FIX: Check all 3 relationship states ---
             const isFriend = fb.userModel.friendsList.includes(u.uid);
+            const isPending = fb.userModel.outgoingRequests.includes(u.uid);
+
+            let actionButtonHTML = '';
+            if (isFriend) {
+                actionButtonHTML = `<span style="font-size: 12px; color: var(--primary-teal); font-weight: 700;">Friends</span>`;
+            } else if (isPending) {
+                actionButtonHTML = `<button disabled style="background:#e0f7fa; color:var(--bg-dark); border:none; padding:6px 15px; border-radius:20px; font-weight:700; font-size:12px;">Sent ✓</button>`;
+            } else {
+                actionButtonHTML = `<button class="btn-add" style="background:var(--primary-teal); color:var(--bg-dark); border:none; padding:6px 15px; border-radius:20px; font-weight:700; font-size:12px; cursor:pointer;">Add +</button>`;
+            }
+            // ------------------------------------------------
 
             card.innerHTML = `
                 <div class="uc-header">
                     <div class="uc-profile-info">
-                        <img src="${u.avatar}" class="uc-avatar" alt="${u.name}'s avatar">
+                        <img src="${u.avatar || 'artwork/Default_Profile_Icon.png'}" class="uc-avatar" alt="${u.name}'s avatar">
                         <div>
                             <div class="uc-name">${u.name}</div>
                             <div class="uc-location">${u.lastLocation}</div>
                         </div>
                     </div>
                     <div class="uc-actions">
-                        ${!isFriend ? `<button class="btn-add" data-uid="${u.uid}">Add +</button>` : ''}
-                        <button class="btn-remove">-</button>
+                        ${actionButtonHTML}
                     </div>
                 </div>
                 <div class="badges-scroll">
@@ -54,11 +63,10 @@ export class DashboardController {
                 </div>
             `;
 
-            // Attach event listener safely without inline onclick
-            if (!isFriend) {
-                card.querySelector('.btn-add').addEventListener('click', (e) => this.addFriend(u.uid, e.target));
+            const addBtn = card.querySelector('.btn-add');
+            if (addBtn) {
+                addBtn.addEventListener('click', (e) => this.addFriend(u.uid, e.target));
             }
-            card.querySelector('.btn-remove').addEventListener('click', () => alert('Hide user feature coming soon.'));
 
             this.listContainer.appendChild(card);
         });
@@ -68,8 +76,7 @@ export class DashboardController {
         btnElement.disabled = true;
         btnElement.textContent = 'Sending...';
         await fb.sendFriendRequest(friendUid);
-        btnElement.textContent = 'Sent ✓';
-        btnElement.style.background = '#e0f7fa';
-        btnElement.style.color = 'var(--bg-dark)';
+        // We no longer need to manually change it to "Sent ✓" here!
+        // Firebase will instantly trigger the render loop and draw the new Pending button.
     }
 }

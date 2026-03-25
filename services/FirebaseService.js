@@ -164,6 +164,21 @@ class FirebaseService {
             await updateDoc(targetRef, { outgoingRequests: outgoing });
         }
     }
+
+    async removeFriend(targetUid) {
+        // Remove them from your list
+        this.userModel.friendsList = this.userModel.friendsList.filter(id => id !== targetUid);
+        await this.saveMyProfile();
+
+        // Remove you from their list
+        const targetRef = doc(this.getUsersCollection(), targetUid);
+        const targetSnap = await getDoc(targetRef);
+        if (targetSnap.exists()) {
+            const targetData = targetSnap.data();
+            const friends = (targetData.friendsList || []).filter(id => id !== this.currentUser.uid);
+            await updateDoc(targetRef, { friendsList: friends });
+        }
+    }
 }
 
 export const fb = new FirebaseService();

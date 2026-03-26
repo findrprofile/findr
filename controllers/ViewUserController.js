@@ -40,7 +40,7 @@ export class ViewUserController {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             if (!arr || arr.length === 0) {
-                container.innerHTML = '<span style="font-size:12px; color:#888;">No badges yet</span>';
+                container.innerHTML = '<span style="font-size:12px; color:--bg-light;">No badges yet</span>';
                 return;
             }
             arr.forEach(tag => {

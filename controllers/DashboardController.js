@@ -150,18 +150,26 @@ export class DashboardController {
                 const detectedBuilding = this.findMyBuilding(myLat, myLng);
                 const isOnCampus = this.calculateDistance(myLat, myLng, this.CAMPUS_CENTER.lat, this.CAMPUS_CENTER.lng) <= this.CAMPUS_CENTER.radius;
 
+                // 1. Determine exactly what to tell the database
+                let newLocationString = "Off Campus";
+                
                 if (detectedBuilding) {
                     this.currentLocationState = detectedBuilding;
+                    newLocationString = detectedBuilding.code;
                 } else if (isOnCampus) {
-                    this.currentLocationState = "Campus Grounds";
+                    this.currentLocationState = "On Campus";
+                    newLocationString = "On Campus";
                 } else {
                     this.currentLocationState = "Off Campus";
+                    newLocationString = "Off Campus";
                 }
 
-                if (fb.userModel && detectedBuilding) {
-                    await fb.updateUserLocation(detectedBuilding.code);
+                // 2. ALWAYS tell the database where we are, even if we went home!
+                if (fb.userModel) {
+                    await fb.updateUserLocation(newLocationString);
                 }
 
+                // 3. Update the UI
                 this.setUIState(this.currentLocationState);
             },
             (error) => {
@@ -302,7 +310,7 @@ export class DashboardController {
                     </div>
                     <div class="uc-actions">${actionButtonHTML}</div>
                 </div>
-                <div class="badges-scroll">${badgesHTML || '<span style="font-size:11px;color:#888;">No badges yet</span>'}</div>
+                <div class="badges-scroll">${badgesHTML || '<span style="font-size:11px;color:--bg-light;">No badges yet</span>'}</div>
             `;
 
             const addBtn = card.querySelector('.btn-add');

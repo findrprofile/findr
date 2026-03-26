@@ -68,12 +68,12 @@ export class NotificationController {
                             <img src="${u.avatar || 'artwork/Default_Profile_Icon.png'}" class="uc-avatar" alt="${u.name}'s avatar">
                             <div>
                                 <div class="uc-name">${u.name}</div>
-                                <div class="uc-location" style="color:var(--text-secondary); font-size: 12px;">Sent you a friend request</div>
+                                <div class="uc-location" style="color:var(--bg-secondary); font-size: 12px;">Sent you a friend request</div>
                             </div>
                         </div>
                         <div class="uc-actions" style="display: flex; gap: 8px;">
                             <button class="btn-card-accept" style="background:var(--primary-teal); color:var(--bg-dark); border:none; padding:8px 16px; border-radius:20px; font-weight:700; font-size: 13px; cursor:pointer;">Accept</button>
-                            <button class="btn-card-decline" style="background:transparent; color:#ef4444; border:2px solid #ef4444; padding:6px 14px; border-radius:20px; font-weight:700; font-size: 13px; cursor:pointer;">Decline</button>
+                            <button class="btn-card-decline" style="background:#ffffff; color:#ef4444; border:2px solid #ef4444; padding:6px 14px; border-radius:20px; font-weight:700; font-size: 13px; cursor:pointer;">Decline</button>
                         </div>
                     </div>
                 `;

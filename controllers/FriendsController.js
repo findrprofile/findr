@@ -1,9 +1,11 @@
 import { fb } from '../services/FirebaseService.js';
-import { getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// We completely removed getDocs because we are switching to live listeners!
 
 export class FriendsController {
-    
-    // THE FIX: Translates milliseconds into human-readable time
+    constructor() {
+        this.unsubscribe = null; // Keeps track of our live connection
+    }
+
     formatTimeAgo(timestamp) {
         if (!timestamp) return 'Now';
         const diffInSeconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -19,35 +21,43 @@ export class FriendsController {
         return `${days}d ago`;
     }
 
-    async render() {
+    render() {
         const container = document.getElementById('friends-list');
+        if (!container) return;
         container.innerHTML = '<p style="color:var(--text-secondary);">Loading friends...</p>';
         
         if (!fb.currentUser) return;
 
-        try {
-            const snapshot = await getDocs(fb.getUsersCollection());
+        // 1. Clean up any old listeners so they don't stack up and lag the app
+        if (this.unsubscribe) {
+            this.unsubscribe();
+            this.unsubscribe = null;
+        }
+
+        // 2. THE FIX: Start the live security camera feed!
+        this.unsubscribe = fb.listenToAllUsers((users) => {
+            
+            // Safety check: Don't redraw if they already clicked over to a different tab
+            if (window.app.router.currentView !== 'friends') return;
+
             container.innerHTML = '';
             let hasFriends = false;
 
-            snapshot.forEach(docSnap => {
-                if (fb.userModel.friendsList.includes(docSnap.id)) {
+            users.forEach(u => {
+                // Check if they are in your friends list
+                if (fb.userModel.friendsList.includes(u.uid)) {
                     hasFriends = true;
-                    const u = docSnap.data();
                     const card = document.createElement('div');
                     card.style.cssText = "display:flex; align-items:center; justify-content:space-between; gap:15px; background:white; padding:15px; border-radius:15px; margin-bottom:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05);";
                     
-                    // Generate the dynamic time string
                     const timeString = this.formatTimeAgo(u.lastActive);
 
-                    // --- NEW PRIVACY & FORMATTING LOGIC ---
                     let displayLocation = u.lastLocation || 'Off Campus';
                     
-                    // PRIVACY CHECK: If they turned off tracking, mask their location from friends
+                    // Privacy & Formatting Logic
                     if (u.locationTrackingEnabled === false) {
                         displayLocation = "Off Campus";
                     } else {
-                        // Cleans up any old ghost data in the database automatically
                         const locationAbbreviations = {
                             'Maanjiwe Nendamowinan': 'MN',
                             'Instructional Centre': 'IB',
@@ -63,7 +73,6 @@ export class FriendsController {
                             displayLocation = locationAbbreviations[displayLocation];
                         }
                     }
-                    // --------------------------------------
 
                     card.innerHTML = `
                         <div class="friend-profile-info" style="display:flex; align-items:center; gap:15px; flex: 1; cursor: pointer;" title="View Profile">
@@ -79,7 +88,7 @@ export class FriendsController {
                     const profileClickZone = card.querySelector('.friend-profile-info');
                     if (profileClickZone) {
                         profileClickZone.addEventListener('click', () => {
-                            window.app.viewUserController.showProfile(docSnap.id);
+                            window.app.viewUserController.showProfile(u.uid);
                         });
                     }
 
@@ -89,8 +98,8 @@ export class FriendsController {
                             if(confirm(`Are you sure you want to remove ${u.name}?`)) {
                                 card.style.opacity = '0.5';
                                 card.style.pointerEvents = 'none';
-                                await fb.removeFriend(docSnap.id);
-                                this.render(); 
+                                await fb.removeFriend(u.uid);
+                                this.render(); // Force a clean refresh to drop them from the list
                             }
                         });
                     }
@@ -106,9 +115,6 @@ export class FriendsController {
                         <p style="color: var(--text-secondary); font-size: 14px;">Head to the Dashboard to see who's around you!</p>
                     </div>`;
             }
-        } catch (error) {
-            console.error("Error loading friends:", error);
-            container.innerHTML = '<p style="color:#ef4444;">Failed to load friends.</p>';
-        }
+        });
     }
 }

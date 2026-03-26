@@ -157,7 +157,7 @@ export class DashboardController {
                     this.currentLocationState = detectedBuilding;
                     newLocationString = detectedBuilding.code;
                 } else if (isOnCampus) {
-                    this.currentLocationState = "On Campus";
+                    this.currentLocationState = "Campus Grounds";
                     newLocationString = "On Campus";
                 } else {
                     this.currentLocationState = "Off Campus";

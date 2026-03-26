@@ -3,27 +3,35 @@ export class User {
         this.uid = data.uid || '';
         this.name = data.name || 'Anonymous Student';
         this.bio = data.bio || 'Studying at UTM.';
-        
-        // --- THE FIX ---
+
         let loadedAvatar = data.avatar;
-        // If the database tries to hand us the old SVG, ignore it!
         if (loadedAvatar && loadedAvatar.includes('data:image/svg+xml')) {
-            loadedAvatar = null; 
+            loadedAvatar = null;
         }
-        // Fallback to your beautiful new default icon
         this.avatar = loadedAvatar || 'artwork/Default_Profile_Icon.png';
-        // --------------
-        
+
         this.tags = {
             interests: Array.isArray(data.tags?.interests) ? data.tags.interests : [],
             skills: Array.isArray(data.tags?.skills) ? data.tags.skills : [],
             hangouts: Array.isArray(data.tags?.hangouts) ? data.tags.hangouts : []
         };
-        
+
         this.lastLocation = data.lastLocation || 'Maanjiwe Nendamowinan';
+        this.locationCode = data.locationCode || 'MN';
+
         this.friendsList = Array.isArray(data.friendsList) ? data.friendsList : [];
         this.incomingRequests = Array.isArray(data.incomingRequests) ? data.incomingRequests : [];
         this.outgoingRequests = Array.isArray(data.outgoingRequests) ? data.outgoingRequests : [];
+
+        this.locationTrackingEnabled =
+            typeof data.locationTrackingEnabled === 'boolean'
+                ? data.locationTrackingEnabled
+                : true;
+
+        this.privateModeEnabled =
+            typeof data.privateModeEnabled === 'boolean'
+                ? data.privateModeEnabled
+                : false;
     }
 
     addTag(category, tagText) {
@@ -52,10 +60,9 @@ export class User {
             bio: this.bio,
             avatar: this.avatar,
             tags: this.tags,
-            lastLocation: this.lastLocation,
             friendsList: this.friendsList,
-            incomingRequests: this.incomingRequests, // Add this
-            outgoingRequests: this.outgoingRequests  // Add this
+            incomingRequests: this.incomingRequests,
+            outgoingRequests: this.outgoingRequests
         };
     }
 }

@@ -7,28 +7,29 @@ export class DashboardController {
     }
 
     start() {
-        // Starts the real-time listener from the Firebase service
-        this.unsubscribe = fb.listenToAllUsers((users) => {
+        this.unsubscribe = fb.listenToVisibleUsersInMyLocation((users) => {
             this.render(users);
         });
     }
 
     render(users) {
         this.listContainer.innerHTML = '';
+
         if (users.length === 0) {
-            this.listContainer.innerHTML = '<p style="color:var(--text-secondary)">No one else is around right now.</p>';
+            this.listContainer.innerHTML =
+                '<p style="color:var(--text-secondary)">No one else is around right now.</p>';
             return;
         }
 
         users.forEach(u => {
             const card = document.createElement('div');
             card.className = 'user-card';
-            
-            // Generate the HTML for the badges
+
             let badgesHTML = '';
             const renderBadges = (arr, colorClass) => {
                 arr.forEach(tag => badgesHTML += `<span class="badge ${colorClass}">${tag}</span>`);
             };
+
             renderBadges(u.tags.interests, 'orange');
             renderBadges(u.tags.skills, 'blue');
             renderBadges(u.tags.hangouts, 'purple');
@@ -54,11 +55,13 @@ export class DashboardController {
                 </div>
             `;
 
-            // Attach event listener safely without inline onclick
             if (!isFriend) {
                 card.querySelector('.btn-add').addEventListener('click', (e) => this.addFriend(u.uid, e.target));
             }
-            card.querySelector('.btn-remove').addEventListener('click', () => alert('Hide user feature coming soon.'));
+
+            card.querySelector('.btn-remove').addEventListener('click', () => {
+                alert('Hide user feature coming soon.');
+            });
 
             this.listContainer.appendChild(card);
         });

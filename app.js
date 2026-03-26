@@ -6,34 +6,35 @@ import { FriendsController } from './controllers/FriendsController.js';
 import { ProfileController } from './controllers/ProfileController.js';
 import { EditProfileController } from './controllers/EditProfileController.js';
 import { AuthController } from './controllers/AuthController.js';
+import { SettingsController } from './controllers/SettingsController.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const app = {
     init() {
-        // Initialize controllers
         this.router = new AppRouter(this);
         this.dashboardController = new DashboardController();
         this.friendsController = new FriendsController();
         this.profileController = new ProfileController(this);
         this.editController = new EditProfileController(this);
-        this.authController = new AuthController(this); 
-        
-        // BUG FIX: Turn on the Notification Controller
+        this.authController = new AuthController(this);
         this.notificationController = new NotificationController(this);
-        
-        window.app = this; 
+        this.settingsController = new SettingsController();
+
+        window.app = this;
 
         this.setupGlobalListeners();
 
-        // Initialize Firebase Auth
-        fb.initAuth((user) => {
-            if (user) {
-                // BUG FIX: Start listening for friend requests!
-                this.notificationController.startListener();
-                
-                this.dashboardController.start();
-                this.router.navigate('dashboard');
-            } else {
+        fb.initAuth(async (user) => {
+            try {
+                if (user) {
+                    this.notificationController.startListener();
+                    this.dashboardController.start();
+                    this.router.navigate('dashboard');
+                } else {
+                    this.router.navigate('login');
+                }
+            } catch (error) {
+                console.error("App startup error:", error);
                 this.router.navigate('login');
             }
         });
@@ -43,7 +44,7 @@ const app = {
         const logoutBtn = document.getElementById('btn-logout');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
-                if(confirm("Are you sure you want to log out?")) {
+                if (confirm("Are you sure you want to log out?")) {
                     await signOut(fb.auth);
                     window.location.reload();
                 }

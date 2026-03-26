@@ -295,7 +295,34 @@
           <div class="container">
             <h1 class="page-title">Settings</h1>
             <div class="settings-panel">
-              <p>Settings are mocked for this prototype.</p>
+              <div class="setting-row">
+                <div class="setting-text">
+                  <div class="setting-title">Location Tracking</div>
+                  <div class="setting-description">
+                    When off, other users will not see you in building activity lists.
+                  </div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggle-location-tracking" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-text">
+                  <div class="setting-title">Private Mode</div>
+                  <div class="setting-description">
+                    When on, only your friends can see your building/location on the dashboard.
+                  </div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggle-private-mode" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <p id="settings-save-status" style="margin-top: 12px; font-size: 13px;"></p>
+
               <button id="btn-logout" class="btn-outline logout-btn">
                 Log Out
               </button>

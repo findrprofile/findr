@@ -7,7 +7,6 @@ export class DashboardController {
     }
 
     start() {
-        // Starts the real-time listener from the Firebase service
         this.unsubscribe = fb.listenToAllUsers((users) => {
             this.render(users);
         });
@@ -15,20 +14,35 @@ export class DashboardController {
 
     render(users) {
         this.listContainer.innerHTML = '';
-        if (users.length === 0) {
+
+        const visibleUsers = users.filter(u => {
+            const isFriend = fb.userModel.friendsList.includes(u.uid);
+            const trackingOn = u.locationTrackingEnabled !== false;
+            const privateModeOn = u.privacyModeEnabled === true;
+
+            // If tracking is off, nobody should see them on the location dashboard
+            if (!trackingOn) return false;
+
+            // If privacy mode is on, only friends can see them
+            if (privateModeOn && !isFriend) return false;
+
+            return true;
+        });
+
+        if (visibleUsers.length === 0) {
             this.listContainer.innerHTML = '<p style="color:var(--text-secondary)">No one else is around right now.</p>';
             return;
         }
 
-        users.forEach(u => {
+        visibleUsers.forEach(u => {
             const card = document.createElement('div');
             card.className = 'user-card';
             
-            // Generate the HTML for the badges
             let badgesHTML = '';
             const renderBadges = (arr, colorClass) => {
                 arr.forEach(tag => badgesHTML += `<span class="badge ${colorClass}">${tag}</span>`);
             };
+
             renderBadges(u.tags.interests, 'orange');
             renderBadges(u.tags.skills, 'blue');
             renderBadges(u.tags.hangouts, 'purple');
@@ -54,12 +68,11 @@ export class DashboardController {
                 </div>
             `;
 
-            // Attach event listener safely without inline onclick
             if (!isFriend) {
                 card.querySelector('.btn-add').addEventListener('click', (e) => this.addFriend(u.uid, e.target));
             }
-            card.querySelector('.btn-remove').addEventListener('click', () => alert('Hide user feature coming soon.'));
 
+            card.querySelector('.btn-remove').addEventListener('click', () => alert('Hide user feature coming soon.'));
             this.listContainer.appendChild(card);
         });
     }

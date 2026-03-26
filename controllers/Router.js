@@ -26,9 +26,9 @@ export class AppRouter {
 
         this.currentView = viewId;
         
-        // Trigger view-specific logic
         if (viewId === 'profile') this.app.profileController.render();
         if (viewId === 'edit') this.app.editController.mount();
         if (viewId === 'friends') this.app.friendsController.render();
+        if (viewId === 'settings') this.app.settingsController.render();
     }
 }

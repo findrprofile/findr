@@ -295,7 +295,34 @@
           <div class="container">
             <h1 class="page-title">Settings</h1>
             <div class="settings-panel">
-              <p>Settings are mocked for this prototype.</p>
+              <div class="setting-row">
+                <div class="setting-text">
+                  <div class="setting-title">Location Tracking</div>
+                  <div class="setting-description">
+                    When off, you will not appear in the live location dashboard.
+                  </div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="setting-location-tracking" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-text">
+                  <div class="setting-title">Privacy Mode</div>
+                  <div class="setting-description">
+                    When on, only your friends can see you on the live location dashboard.
+                  </div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="setting-privacy-mode" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div id="settings-save-status" class="settings-save-status"></div>
+
               <button id="btn-logout" class="btn-outline logout-btn">
                 Log Out
               </button>

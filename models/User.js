@@ -4,15 +4,11 @@ export class User {
         this.name = data.name || 'Anonymous Student';
         this.bio = data.bio || 'Studying at UTM.';
         
-        // --- THE FIX ---
         let loadedAvatar = data.avatar;
-        // If the database tries to hand us the old SVG, ignore it!
         if (loadedAvatar && loadedAvatar.includes('data:image/svg+xml')) {
             loadedAvatar = null; 
         }
-        // Fallback to your beautiful new default icon
         this.avatar = loadedAvatar || 'artwork/Default_Profile_Icon.png';
-        // --------------
         
         this.tags = {
             interests: Array.isArray(data.tags?.interests) ? data.tags.interests : [],
@@ -24,6 +20,10 @@ export class User {
         this.friendsList = Array.isArray(data.friendsList) ? data.friendsList : [];
         this.incomingRequests = Array.isArray(data.incomingRequests) ? data.incomingRequests : [];
         this.outgoingRequests = Array.isArray(data.outgoingRequests) ? data.outgoingRequests : [];
+
+        // New settings with safe defaults for old accounts
+        this.locationTrackingEnabled = data.locationTrackingEnabled !== false;
+        this.privacyModeEnabled = data.privacyModeEnabled === true;
     }
 
     addTag(category, tagText) {
@@ -54,8 +54,10 @@ export class User {
             tags: this.tags,
             lastLocation: this.lastLocation,
             friendsList: this.friendsList,
-            incomingRequests: this.incomingRequests, // Add this
-            outgoingRequests: this.outgoingRequests  // Add this
+            incomingRequests: this.incomingRequests,
+            outgoingRequests: this.outgoingRequests,
+            locationTrackingEnabled: this.locationTrackingEnabled,
+            privacyModeEnabled: this.privacyModeEnabled
         };
     }
 }

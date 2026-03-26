@@ -9,8 +9,6 @@ export class FriendsController {
         if (!fb.currentUser) return;
 
         try {
-            // Note: In a production app, you'd query specifically for friend UIDs.
-            // For this prototype, we're doing a simple fetch and filter.
             const snapshot = await getDocs(fb.getUsersCollection());
             container.innerHTML = '';
             let hasFriends = false;
@@ -19,13 +17,18 @@ export class FriendsController {
                 if (fb.userModel.friendsList.includes(docSnap.id)) {
                     hasFriends = true;
                     const u = docSnap.data();
+                    const trackingOn = u.locationTrackingEnabled !== false;
+                    const locationText = trackingOn
+                        ? `${u.lastLocation} • Now`
+                        : 'Location hidden';
+
                     const card = document.createElement('div');
                     card.style.cssText = "display:flex; align-items:center; gap:15px; background:white; padding:15px; border-radius:15px; margin-bottom:10px; box-shadow:0 2px 10px rgba(0,0,0,0.05);";
                     card.innerHTML = `
                         <img src="${u.avatar || ''}" alt="${u.name}" style="width:50px; height:50px; border-radius:50%; background:#eee; object-fit:cover;">
                         <div>
                             <div style="font-weight:700;">${u.name}</div>
-                            <div style="font-size:12px; color:var(--text-secondary);">${u.lastLocation} • Now</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">${locationText}</div>
                         </div>
                     `;
                     container.appendChild(card);

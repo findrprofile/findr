@@ -154,3 +154,83 @@ body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: h
 /* Settings */
 .settings-panel { background: #f9f9f9; padding: 20px; border-radius: 15px; }
 .settings-panel p { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.setting-row:last-of-type {
+    margin-bottom: 8px;
+}
+
+.setting-text {
+    flex: 1;
+}
+
+.setting-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.setting-description {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.settings-save-status {
+    min-height: 18px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 12px 0 18px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    background-color: #d1d5db;
+    transition: 0.2s;
+    border-radius: 999px;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    top: 4px;
+    background-color: white;
+    transition: 0.2s;
+    border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+    background-color: var(--bg-dark);
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(22px);
+}

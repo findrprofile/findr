@@ -115,7 +115,7 @@ export class AuthController {
 
             await fb.sendPasswordReset(email);
             this.errorDisplay.style.color = '#16a34a';
-            this.errorDisplay.textContent = 'Password reset email sent. Check your inbox.';
+            this.errorDisplay.textContent = 'Password reset email sent. Check your inbox and spam folders.';
         } catch (error) {
             console.error("Password Reset Error:", error);
             this.errorDisplay.style.color = '#ef4444';

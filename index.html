@@ -357,8 +357,104 @@
         <div id="view-settings" class="view">
           <div class="container">
             <h1 class="page-title">Settings</h1>
+
+            <style>
+              .switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 28px;
+              }
+              .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+              }
+              .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: 0.4s;
+                border-radius: 34px;
+              }
+              .slider:before {
+                position: absolute;
+                content: "";
+                height: 20px;
+                width: 20px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: 0.4s;
+                border-radius: 50%;
+              }
+              input:checked + .slider {
+                background-color: var(--primary-teal);
+              }
+              input:checked + .slider:before {
+                transform: translateX(22px);
+              }
+            </style>
+
             <div class="settings-panel">
-              <p>Settings are mocked for this prototype.</p>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 20px;
+                  padding-bottom: 20px;
+                  border-bottom: 1px solid #eee;
+                "
+              >
+                <div>
+                  <h3 style="margin: 0; font-size: 16px">Location Tracking</h3>
+                  <p
+                    style="
+                      margin: 0;
+                      font-size: 12px;
+                      color: var(--text-secondary);
+                    "
+                  >
+                    Allow Findr to update your campus location.
+                  </p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggle-location" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 30px;
+                "
+              >
+                <div>
+                  <h3 style="margin: 0; font-size: 16px">Private Mode</h3>
+                  <p
+                    style="
+                      margin: 0;
+                      font-size: 12px;
+                      color: var(--text-secondary);
+                    "
+                  >
+                    Only show my location to accepted friends.
+                  </p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggle-private" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+
               <button id="btn-logout" class="btn-outline logout-btn">
                 Log Out
               </button>

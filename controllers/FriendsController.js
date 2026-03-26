@@ -40,12 +40,37 @@ export class FriendsController {
                     // Generate the dynamic time string
                     const timeString = this.formatTimeAgo(u.lastActive);
 
+                    // --- NEW PRIVACY & FORMATTING LOGIC ---
+                    let displayLocation = u.lastLocation || 'Off Campus';
+                    
+                    // PRIVACY CHECK: If they turned off tracking, mask their location from friends
+                    if (u.locationTrackingEnabled === false) {
+                        displayLocation = "Off Campus";
+                    } else {
+                        // Cleans up any old ghost data in the database automatically
+                        const locationAbbreviations = {
+                            'Maanjiwe Nendamowinan': 'MN',
+                            'Instructional Centre': 'IB',
+                            'Communication Culture & Technology': 'CC',
+                            'The William G. Davis Building': 'DV',
+                            'The Kaneff Centre': 'KN',
+                            'Terrence Donnelly Health Sciences': 'HB',
+                            'U of T Mississauga Library': 'Library',
+                            'Deerfield Hall': 'DH',
+                            'The Science Building': 'Science'
+                        };
+                        if (locationAbbreviations[displayLocation]) {
+                            displayLocation = locationAbbreviations[displayLocation];
+                        }
+                    }
+                    // --------------------------------------
+
                     card.innerHTML = `
                         <div class="friend-profile-info" style="display:flex; align-items:center; gap:15px; flex: 1; cursor: pointer;" title="View Profile">
                             <img src="${u.avatar || 'artwork/Default_Profile_Icon.png'}" alt="${u.name}" style="width:50px; height:50px; border-radius:50%; background:#eee; object-fit:cover; border: 2px solid var(--primary-teal);">
                             <div>
                                 <div style="font-weight:700;">${u.name}</div>
-                                <div style="font-size:12px; color:var(--text-secondary);">${u.lastLocation || 'Off Campus'} • ${timeString}</div>
+                                <div style="font-size:12px; color:var(--text-secondary);">${displayLocation} • ${timeString}</div>
                             </div>
                         </div>
                         <button class="btn-remove-friend" style="background:#fef2f2; color:#ef4444; border:none; padding:8px 12px; border-radius:12px; font-weight:700; font-size: 12px; cursor:pointer;">Remove</button>

@@ -128,14 +128,22 @@ export class DashboardController {
     // --- GEOLOCATION LOGIC ---
 
     locateUser() {
+        // PRIVACY CHECK: Did they turn off location in settings?
+        if (fb.userModel && fb.userModel.locationTrackingEnabled === false) {
+            this.setUIState("Location Disabled");
+            return;
+        }
+
         if (!navigator.geolocation) {
             this.setUIState("Off Campus");
             return;
         }
 
-        // Ask the device for GPS coordinates
         this.watchId = navigator.geolocation.watchPosition(
             async (position) => {
+                // Double check just in case a rogue GPS signal comes in
+                if (fb.userModel && fb.userModel.locationTrackingEnabled === false) return;
+
                 const myLat = position.coords.latitude;
                 const myLng = position.coords.longitude;
                 
@@ -150,7 +158,6 @@ export class DashboardController {
                     this.currentLocationState = "Off Campus";
                 }
 
-                // Save this new location to Firebase so others can see where you are!
                 if (fb.userModel && detectedBuilding) {
                     await fb.updateUserLocation(detectedBuilding.code);
                 }
@@ -159,7 +166,7 @@ export class DashboardController {
             },
             (error) => {
                 console.error("GPS Error:", error);
-                this.setUIState("Off Campus"); // Default to off-campus if they deny GPS permissions
+                this.setUIState("Off Campus"); 
             },
             { enableHighAccuracy: true }
         );
@@ -204,12 +211,24 @@ export class DashboardController {
     // --- UI & FIREBASE RENDER LOGIC ---
 
     setUIState(locationData) {
-        if (locationData === "Off Campus") {
-            this.mainTitle.innerHTML = "You are currently off campus.";
+        if (locationData === "Off Campus" || locationData === "Location Disabled") {
+            
+            // Dynamically change the title based on WHY the screen is blank
+            if (locationData === "Location Disabled") {
+                this.mainTitle.innerHTML = "Location tracking is disabled.<br><span style='font-size:14px; font-weight:normal; color:var(--text-secondary);'>Turn it on in Settings to see who is around you.</span>";
+            } else {
+                this.mainTitle.innerHTML = "You are currently off campus.";
+            }
+
             this.heroCard.style.display = "none";
             this.subtitle.style.display = "none";
             this.listContainer.innerHTML = '';
-            if (this.unsubscribe) { this.unsubscribe(); this.unsubscribe = null; }
+            
+            // Shut off the database listener so they stop receiving updates about other people
+            if (this.unsubscribe) { 
+                this.unsubscribe(); 
+                this.unsubscribe = null; 
+            }
 
         } else if (locationData === "Campus Grounds") {
             this.mainTitle.innerHTML = "Welcome to the<br><span style='font-weight: 800'>University of Toronto Mississauga!</span>";
@@ -231,8 +250,19 @@ export class DashboardController {
             // Turn on the Firebase listener ONLY for people in this specific building
             if (!this.unsubscribe) {
                 this.unsubscribe = fb.listenToAllUsers((users) => {
-                    // Filter the database so it ONLY shows users matching this building code
-                    const peopleInMyBuilding = users.filter(u => u.lastLocation === locationData.code);
+                    const peopleInMyBuilding = users.filter(u => {
+                        // 1. Are they in this building?
+                        if (u.lastLocation !== locationData.code) return false;
+                        
+                        // 2. PRIVACY CHECK: Is their location turned off completely?
+                        if (u.locationTrackingEnabled === false) return false;
+                        
+                        // 3. PRIVACY CHECK: Are they private, and NOT on my friends list?
+                        const friendsList = fb.userModel.friendsList || [];
+                        if (u.privateModeEnabled && !friendsList.includes(u.uid)) return false;
+                        
+                        return true; // They passed all checks, show them!
+                    });
                     this.renderList(peopleInMyBuilding);
                 });
             }

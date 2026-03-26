@@ -92,7 +92,7 @@ class FirebaseService {
     }
 
     async updateUserLocation(locationCode) {
-        if (!this.currentUser) return;
+        if (!this.currentUser || this.userModel.locationTrackingEnabled === false) return;
         const docRef = doc(this.getUsersCollection(), this.currentUser.uid);
         const timestamp = Date.now();
         

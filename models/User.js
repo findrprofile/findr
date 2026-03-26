@@ -22,6 +22,9 @@ export class User {
         
         this.lastLocation = data.lastLocation || 'Maanjiwe Nendamowinan';
         this.lastActive = data.lastActive || Date.now();
+        // Default to tracking ON, and private mode OFF
+        this.locationTrackingEnabled = data.locationTrackingEnabled !== undefined ? data.locationTrackingEnabled : true;
+        this.privateModeEnabled = data.privateModeEnabled || false;
         this.friendsList = Array.isArray(data.friendsList) ? data.friendsList : [];
         this.incomingRequests = Array.isArray(data.incomingRequests) ? data.incomingRequests : [];
         this.outgoingRequests = Array.isArray(data.outgoingRequests) ? data.outgoingRequests : [];
@@ -57,7 +60,9 @@ export class User {
             lastActive: this.lastActive,
             friendsList: this.friendsList,
             incomingRequests: this.incomingRequests, // Add this
-            outgoingRequests: this.outgoingRequests  // Add this
+            outgoingRequests: this.outgoingRequests,
+            locationTrackingEnabled: this.locationTrackingEnabled,
+            privateModeEnabled: this.privateModeEnabled  // Add this
         };
     }
 }

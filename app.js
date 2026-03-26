@@ -7,6 +7,7 @@ import { ProfileController } from './controllers/ProfileController.js';
 import { ViewUserController } from './controllers/ViewUserController.js';
 import { EditProfileController } from './controllers/EditProfileController.js';
 import { AuthController } from './controllers/AuthController.js';
+import { SettingsController } from './controllers/SettingsController.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const app = {
@@ -19,6 +20,7 @@ const app = {
         this.viewUserController = new ViewUserController(this);
         this.editController = new EditProfileController(this);
         this.authController = new AuthController(this); 
+        this.settingsController = new SettingsController(this);
         
         // BUG FIX: Turn on the Notification Controller
         this.notificationController = new NotificationController(this);

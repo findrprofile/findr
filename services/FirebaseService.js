@@ -91,6 +91,23 @@ class FirebaseService {
         return await getDownloadURL(storageRef);
     }
 
+    async updateUserLocation(locationCode) {
+        if (!this.currentUser) return;
+        const docRef = doc(this.getUsersCollection(), this.currentUser.uid);
+        const timestamp = Date.now();
+        
+        // Update the local model
+        this.userModel.lastLocation = locationCode;
+        this.userModel.lastActive = timestamp;
+        
+        // THE FIX: ONLY update these two exact fields in Firestore! 
+        // This prevents the GPS from accidentally deleting incoming friend requests.
+        await updateDoc(docRef, {
+            lastLocation: locationCode,
+            lastActive: timestamp
+        });
+    }
+
     async getUserProfile(uid) {
         const docRef = doc(this.getUsersCollection(), uid);
         const snap = await getDoc(docRef);
